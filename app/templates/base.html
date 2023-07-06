@@ -1,0 +1,499 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EnergoApp</title>
+  
+  <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+  <script>
+    var intervalId = null; 
+    var runningTotal = 0;
+    var interval2Id = null; 
+    var mazutTotal = 0;
+    var interval3Id = null; 
+    var kotel1Total = 0;
+    var interval4Id = null; 
+    var kotel2Total = 0;
+    var interval5Id = null; 
+    var kotel3Total = 0;
+    var interval6Id = null; 
+    var eTotal = 0;
+    var interval7Id = null; 
+    var e2Total = 0;
+    var intervalData = null;
+    function getCookie(name) {
+  const cookieValue = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(name + '='))
+    ?.split('=')[1];
+  return cookieValue ? decodeURIComponent(cookieValue) : null;
+}
+
+    function sendDataToServer() {
+      label = document.getElementById("t_total")
+      const value = parseFloat(label.textContent); // Replace with your actual float value
+      const csrftoken = getCookie('csrftoken');
+      const data = {
+        value: value
+      };
+      console.log(JSON.stringify(data))
+      fetch('/save-data/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify(data),
+      })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+      console.log('Data saved successfully!');
+    } else {
+      console.error('Failed to save data:', result.message);
+    }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+    function handleButtonClick() {
+      var startButton = document.getElementById("start_button");
+      var tonsPerHourInput = document.getElementById("t_per_h");
+      var tonsTotalLabel = document.getElementById("t_total");
+      if (intervalId) {
+        // If the interval is already running, stop it
+        clearInterval(intervalId);
+        clearInterval(intervalData)
+        intervalId = null;
+        startButton.textContent = "Start"; // Update button label
+        tonsPerHourInput.disabled = false;
+      } else {
+        tonsPerHourInput.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+        }
+        sendDataToServer();
+        
+        intervalId = setInterval(function() {
+          var tonsPerHour = parseFloat(tonsPerHourInput.value);
+          runningTotal += tonsPerHour/3600; 
+          tonsTotalLabel.textContent = runningTotal.toFixed(4);
+        }, 1000);
+        intervalData = setInterval(sendDataToServer, 60000);
+
+        startButton.textContent = "Stop"; 
+      }
+    }
+    function handleMazutClick() {
+      var startButton = document.getElementById("start_button2");
+      var tonsPerHourInput = document.getElementById("t_per_h2");
+      var tonsTotalLabel = document.getElementById("t_total2");
+      if (interval2Id) {
+        // If the interval is already running, stop it
+        clearInterval(interval2Id);
+        interval2Id = null;
+        startButton.textContent = "Start"; // Update button label
+        tonsPerHourInput.disabled = false;
+      } else {
+        tonsPerHourInput.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+        }
+        interval2Id = setInterval(function() {
+          var tonsPerHour = parseFloat(tonsPerHourInput.value);
+          mazutTotal += tonsPerHour/3600; 
+          tonsTotalLabel.textContent = mazutTotal.toFixed(4);
+        }, 1000);
+
+        startButton.textContent = "Stop"; 
+      }
+    }
+    function handleKotel1Click() {
+      var startButton = document.getElementById("start_k_button");
+      var tonsPerHourInput = document.getElementById("k_per_h");
+      var tonsTotalLabel = document.getElementById("k_total");
+      if (interval3Id) {
+        // If the interval is already running, stop it
+        clearInterval(interval3Id);
+        interval3Id = null;
+        startButton.textContent = "Start"; // Update button label
+        tonsPerHourInput.disabled = false;
+      } else if(intervalId){
+        tonsPerHourInput.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+        }
+        interval3Id = setInterval(function() {
+          var tonsPerHour = parseFloat(tonsPerHourInput.value);
+          kotel1Total += tonsPerHour/3600; 
+          tonsTotalLabel.textContent = kotel1Total.toFixed(4);
+        }, 1000);
+
+        startButton.textContent = "Stop"; 
+      }
+    }
+    function handleKotel2Click() {
+      var startButton = document.getElementById("start_k_button2");
+      var tonsPerHourInput = document.getElementById("k_per_h2");
+      var tonsTotalLabel = document.getElementById("k_total2");
+      if (interval4Id) {
+        // If the interval is already running, stop it
+        clearInterval(interval4Id);
+        interval4Id = null;
+        startButton.textContent = "Start"; // Update button label
+        tonsPerHourInput.disabled = false;
+      } else if(intervalId){
+        tonsPerHourInput.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+        }
+        interval4Id = setInterval(function() {
+          var tonsPerHour = parseFloat(tonsPerHourInput.value);
+          kotel2Total += tonsPerHour/3600; 
+          tonsTotalLabel.textContent = kotel2Total.toFixed(4);
+        }, 1000);
+
+        startButton.textContent = "Stop"; 
+      }
+    }
+    function handleKotel3Click() {
+      var startButton = document.getElementById("start_k_button3");
+      var tonsPerHourInput = document.getElementById("k_per_h3");
+      var tonsTotalLabel = document.getElementById("k_total3");
+      if (interval5Id) {
+        // If the interval is already running, stop it
+        clearInterval(interval5Id);
+        interval5Id = null;
+        startButton.textContent = "Start"; // Update button label
+        tonsPerHourInput.disabled = false;
+      } else if(intervalId){
+        tonsPerHourInput.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+        }
+        interval5Id = setInterval(function() {
+          var tonsPerHour = parseFloat(tonsPerHourInput.value);
+          kotel3Total += tonsPerHour/3600; 
+          tonsTotalLabel.textContent = kotel3Total.toFixed(4);
+        }, 1000);
+
+        startButton.textContent = "Stop"; 
+      }
+    }
+    function handleTurClick() {
+      var startButton = document.getElementById("start_t_button");
+      var tonsPerHourInput = document.getElementById("mW");
+      var tonsTotalLabel = document.getElementById("e_total");
+      if (interval6Id) {
+        // If the interval is already running, stop it
+        clearInterval(interval6Id);
+        interval6Id = null;
+        startButton.textContent = "Start"; // Update button label
+        tonsPerHourInput.disabled = false;
+      } else {
+        tonsPerHourInput.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+        }
+        interval6Id = setInterval(function() {
+          var tonsPerHour = parseFloat(tonsPerHourInput.value);
+          eTotal += tonsPerHour/3600; 
+          tonsTotalLabel.textContent = eTotal.toFixed(4);
+        }, 1000);
+
+        startButton.textContent = "Stop"; 
+      }
+    }
+    function handleTur2Click() {
+      var startButton = document.getElementById("start_t_button2");
+      var tonsPerHourInput = document.getElementById("mW2");
+      var tonsTotalLabel = document.getElementById("e_total2");
+      if (interval7Id) {
+        // If the interval is already running, stop it
+        clearInterval(interval7Id);
+        interval7Id = null;
+        startButton.textContent = "Start"; // Update button label
+        tonsPerHourInput.disabled = false;
+      } else {
+        tonsPerHourInput.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+        }
+        interval7Id = setInterval(function() {
+          var tonsPerHour = parseFloat(tonsPerHourInput.value);
+          e2Total += tonsPerHour/3600; 
+          tonsTotalLabel.textContent = e2Total.toFixed(4);
+        }, 1000);
+
+        startButton.textContent = "Stop"; 
+      }
+    }
+    function handleIncreaseClick() {
+      var tonsPerHourInput = document.getElementById("t_per_h");
+
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+      }
+    }
+    function handleDecreaseClick() {
+      var tonsPerHourInput = document.getElementById("t_per_h");
+
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+      }
+    }
+    function handleIncrease2Click() {
+      var tonsPerHourInput = document.getElementById("t_per_h2");
+
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+      }
+    }
+    function handleDecrease2Click() {
+      var tonsPerHourInput = document.getElementById("t_per_h2");
+
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+      }
+    }
+    function handleIncrease1_k_Click() {
+      var tonsPerHourInput = document.getElementById("k_per_h");
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+      }
+    }
+    function handleDecrease1_k_Click() {
+      var tonsPerHourInput = document.getElementById("k_per_h");
+
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+      }
+    }
+    function handleIncrease2_k_Click() {
+      var tonsPerHourInput = document.getElementById("k_per_h2");
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+      }
+    }
+    function handleDecrease2_k_Click() {
+      var tonsPerHourInput = document.getElementById("k_per_h2");
+
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+      }
+    }
+    function handleIncrease3_k_Click() {
+      var tonsPerHourInput = document.getElementById("k_per_h3");
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+      }
+    }
+    function handleDecrease3_k_Click() {
+      var tonsPerHourInput = document.getElementById("k_per_h3");
+
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+      }
+    }
+    function handleIncrease_mW_Click() {
+      var tonsPerHourInput = document.getElementById("mW");
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+      }
+    }
+    function handleDecrease_mW_Click() {
+      var tonsPerHourInput = document.getElementById("mW");
+
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+      }
+      
+    }
+    function handleIncrease_mW2_Click() {
+      var tonsPerHourInput = document.getElementById("mW2");
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+      }
+    }
+    function handleDecrease_mW2_Click() {
+      var tonsPerHourInput = document.getElementById("mW2");
+
+      if (tonsPerHourInput.disabled) {
+        var currentValue = parseFloat(tonsPerHourInput.value);
+        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+      }
+      
+    }
+    
+    // Add event listeners when the DOM is loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var startButton = document.getElementById("start_button");
+      var increaseButton = document.getElementById("increase");
+      var decreaseButton = document.getElementById("decrease");
+      var startMazut = document.getElementById("start_button2");
+      var increaseButton2 = document.getElementById("increase2");
+      var decreaseButton2 = document.getElementById("decrease2");
+      var startKotel1 = document.getElementById("start_k_button");
+      var increase_k_button1 = document.getElementById("increase_k");
+      var decrease_k_button1 = document.getElementById("decrease_k");
+      var startKotel2 = document.getElementById("start_k_button2");
+      var increase_k_button2 = document.getElementById("increase2_k");
+      var decrease_k_button2 = document.getElementById("decrease2_k");
+      var startKotel3 = document.getElementById("start_k_button3");
+      var increase_k_button3 = document.getElementById("increase3_k");
+      var decrease_k_button3 = document.getElementById("decrease3_k");
+      var starttur = document.getElementById("start_t_button");
+      var increase_mW_button = document.getElementById("increasemW");
+      var decrease_mW_button = document.getElementById("decreasemW");
+      var starttur2 = document.getElementById("start_t_button2");
+      var increase_mW2_button = document.getElementById("increasemW2");
+      var decrease_mW2_button = document.getElementById("decreasemW2");
+      startButton.addEventListener("click", handleButtonClick);
+      increaseButton.addEventListener("click", handleIncreaseClick);
+      decreaseButton.addEventListener("click", handleDecreaseClick);
+      startMazut.addEventListener("click", handleMazutClick);
+      increaseButton2.addEventListener("click", handleIncrease2Click);
+      decreaseButton2.addEventListener("click", handleDecrease2Click);
+      startKotel1.addEventListener("click", handleKotel1Click);
+      increase_k_button1.addEventListener("click", handleIncrease1_k_Click);
+      decrease_k_button1.addEventListener("click", handleDecrease1_k_Click);
+      startKotel2.addEventListener("click", handleKotel2Click);
+      increase_k_button2.addEventListener("click", handleIncrease2_k_Click);
+      decrease_k_button2.addEventListener("click", handleDecrease2_k_Click);
+      startKotel3.addEventListener("click", handleKotel3Click);
+      increase_k_button3.addEventListener("click", handleIncrease3_k_Click);
+      decrease_k_button3.addEventListener("click", handleDecrease3_k_Click);
+      starttur.addEventListener("click", handleTurClick);
+      increase_mW_button.addEventListener("click", handleIncrease_mW_Click);
+      decrease_mW_button.addEventListener("click", handleDecrease_mW_Click);
+      starttur2.addEventListener("click", handleTur2Click);
+      increase_mW2_button.addEventListener("click", handleIncrease_mW2_Click);
+      decrease_mW2_button.addEventListener("click", handleDecrease_mW2_Click);
+    });
+  </script>
+</head>
+<body>
+  <h1>Sample Sections</h1>
+
+  <!-- Section 1 -->
+
+
+    
+ 
+    <div class="grid-container">
+      <div class="item1">
+        <div class="ugol">Ugol</div>
+        <label class="t_p_h_l">Tons per hour</label>
+        <input type="text" class="input t_p_h" id="t_per_h">
+        <button class= "button inc" id="increase">+</button>
+        <button class= "button dec" id="decrease">-</button>
+        <div>
+            <label class="label totalL">Tons total</label>
+            <label class="total" id="t_total">0</label>
+        </div>
+        <button class= "button start" id="start_button">Start</button>
+      </div>
+      <div class="item2">
+        <div class="mazut">Mazut</div>
+        <label class="t_p_h_l2">Tons per hour</label>
+        <input type="text" class="input t_p_h2" id="t_per_h2">
+        <button class= "button inc2" id="increase2">+</button>
+        <button class= "button dec2" id="decrease2">-</button>
+        <div>
+            <label class="label totalL2">Tons total</label>
+            <label class="total2" id="t_total2">0</label>
+        </div>
+        <button class= "button start2" id="start_button2">Start</button>
+      </div>
+    </div>
+
+    <div class="container2">
+      <div class="item3">
+        <div class="kotel1">Kotel 1</div>
+        <label class="k_p_h_l">Tons per hour</label>
+        <input type="text" class="input k_p_h" id="k_per_h">
+        <button class= "button inc_k" id="increase_k">+</button>
+        <button class= "button dec_k" id="decrease_k">-</button>
+        <div>
+            <label class="label k_totalL">Tons total</label>
+            <label class="k_total" id="k_total">0</label>
+        </div>
+        <button class= "button start_k" id="start_k_button">Start</button>
+      </div>
+      <div class="item4">
+        <div class="kotel2">Kotel 2</div>
+        <label class="k_p_h_l2">Tons per hour</label>
+        <input type="text" class="input k_p_h2" id="k_per_h2">
+        <button class= "button inc_k2" id="increase2_k">+</button>
+        <button class= "button dec_k2" id="decrease2_k">-</button>
+        <div>
+            <label class="label k_totalL2">Tons total</label>
+            <label class="k_total2" id="k_total2">0</label>
+        </div>
+        <button class= "button start_k2" id="start_k_button2">Start</button>
+      </div>
+      <div class="item5">
+        <div class="kotel3">Kotel 3</div>
+        <label class="k_p_h_l3">Tons per hour</label>
+        <input type="text" class="input k_p_h3" id="k_per_h3">
+        <button class= "button inc_k3" id="increase3_k">+</button>
+        <button class= "button dec_k3" id="decrease3_k">-</button>
+        <div>
+            <label class="label k_totalL3">Tons total</label>
+            <label class="k_total3" id="k_total3">0</label>
+        </div>
+        <button class= "button start_k3" id="start_k_button3">Start</button>
+      </div>
+    </div>
+  
+    <div class="container3">
+      <div class="item6">
+        <div class="tur1">Turbina 1</div>
+        <label class="mWL">mW</label>
+        <input type="text" class="input mW" id="mW">
+        <button class= "button incmW" id="increasemW">+</button>
+        <button class= "button decmW" id="decreasemW">-</button>
+        <div>
+            <label class="label e_totalL">kW-hour</label>
+            <label class="e_total" id="e_total">0</label>
+        </div>
+        <button class= "button start_t" id="start_t_button">Start</button>
+      </div>
+      <div class="item7">
+        <div class="tur2">Turbina 2</div>
+        <label class="mWL2">mW</label>
+        <input type="text" class="input mW2" id="mW2">
+        <button class= "button incmW2" id="increasemW2">+</button>
+        <button class= "button decmW2" id="decreasemW2">-</button>
+        <div>
+            <label class="label e_totalL2">kW-hour</label>
+            <label class="e_total2" id="e_total2">0</label>
+        </div>
+        <button class= "button start_t2" id="start_t_button2">Start</button>
+      </div>
+    </div>
+
+  <!-- Section 2 -->
+  
+
+  <!-- Section 3 -->
+  <div class="section">
+    
+  </div>
+
+</body>
+</html>
