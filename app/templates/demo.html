@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo</title>
+  
+  <link rel="stylesheet" type="text/css" href="{% static 'styles2.css' %}">
+  <script>
+    var pressed=0;
+    function animate(duration) {
+        const start = Date.now();
+        function step1() {
+            const elapsed = Date.now() - start;
+            const progress = Math.min((elapsed / duration) * 100, 100);
+            setFillHeight(progress);
+            if (progress < 100) {
+            requestAnimationFrame(step1);
+            }
+        }
+        function step2() {
+            const elapsed = Date.now() - start;
+            const progress = 100 - Math.min((elapsed / duration) * 100, 100);
+            setFillHeight(progress);
+            if (progress > 0) {
+            requestAnimationFrame(step2);
+            }
+        }
+        console.log("pressed is "+pressed)
+        if(pressed === 0){
+            requestAnimationFrame(step1);
+            pressed =1;
+            } else {
+            requestAnimationFrame(step2);
+            pressed=0;
+        }
+    }
+    
+    function setFillHeight(progress) {
+        var fillElement = document.querySelector(".fill");
+        if(fillElement !== null){
+            fillElement.style.height = progress + '%';
+            fillElement.style.transform = `scaleY(${progress / 100})`;
+        } 
+        
+    }
+    var variable=0;
+    var variable2=0;
+    var variables = [];
+    var variable3 = 0;
+    for(var i=0; i<4; i++){
+        variables[i] = 0;
+    }
+    setInterval(() => {
+    // Fetch the value from the source page
+    var dataReceived = JSON.parse(localStorage.getItem('data'));
+    var dataReceived3 = JSON.parse(localStorage.getItem('mazut'));
+    var dataReceived6 = JSON.parse(localStorage.getItem('anime'));
+    if(dataReceived6){
+        if(variable3 === 0 && dataReceived6.pressed === 0){
+            animate(dataReceived6.dur*60000)
+            variable3=1;
+        } else if(variable3 === 1 && dataReceived6.pressed === 1){
+            animate(dataReceived6.dur*60000)
+            console.log(dataReceived6.dur*60000)
+            variable3=0;
+        }
+        
+    }
+    if(dataReceived){
+         document.getElementById("ugolL").textContent = (dataReceived.ugol).toFixed(4)
+    }
+    if(dataReceived3){
+         document.getElementById("mazutL").textContent = (dataReceived3.mazut).toFixed(4)
+    }
+    
+    var dataReceived2 = JSON.parse(localStorage.getItem('imageChange'));
+    var dataReceived4 = JSON.parse(localStorage.getItem('imageMazut'));
+    var dataReceived5 = []
+    dataReceived5[0] = JSON.parse(localStorage.getItem("f11"));
+    dataReceived5[1] = JSON.parse(localStorage.getItem("f12"));
+    dataReceived5[2] = JSON.parse(localStorage.getItem("f13"));
+    dataReceived5[3] = JSON.parse(localStorage.getItem("f14"));
+    for(var i=0; i<4; i++){
+        if(dataReceived5[i]){
+            if(dataReceived5[i].image === 1){
+                if(variables[i] === 0){
+                    var image = document.createElement('img');
+                    image.id = "f1"+(i+1)
+                    image.src = "{% static 'GlIU.gif' %}"
+                    image.classList.add("f"+(i+1));
+                    var container = document.getElementById('container7');
+                    container.appendChild(image);
+                    variables[i] = 1;
+                }
+            } else {
+                if(variables[i]===1){
+                    var img = document.getElementById("f1"+(i+1))
+                    img.remove()
+                    variables[i]=0;
+                    if(i===3){
+                        var turb = document.getElementById("turbine1")
+                        turb.src = "{% static 'turbineon.gif' %}"
+                    }
+                }
+            }
+        }
+    }
+    if(dataReceived2){
+        if(dataReceived2.image === 1){
+            if(variable === 0){
+                var imageGif = document.getElementById("image")
+                imageGif.src = "{% static 'convey2.gif' %}"
+                variable = 1;
+            }
+        } else {
+            if(variable === 1){
+                var imageGif = document.getElementById("image")
+                imageGif.src = "{% static 'convey1.gif' %}"
+                variable = 0;
+                var turb = document.getElementById("turbine1")
+                turb.src = "{% static 'turbineoff.jpeg' %}"
+            }
+        }
+    }
+    if(dataReceived4){
+    if(dataReceived4.image === 1){
+        if(variable2 === 0){
+            var imageGif = document.getElementById("mazut-image")
+            imageGif.src = "{% static 'mazut2.gif' %}"
+            variable2 = 1;
+        }
+    } else {
+        if(variable2 === 1){
+            var imageGif = document.getElementById("mazut-image")
+            imageGif.src = "{% static 'mazut1.png' %}"
+            variable2 = 0;
+        }
+    }
+}
+    }, 1000);
+    document.addEventListener('DOMContentLoaded', function() {
+        const startButton = document.getElementById('startButton');
+        
+
+    
+
+
+
+});
+
+  </script>
+</head>
+<body>
+<div class= "big-container">
+    <div class="container5">
+        <img src="{% static 'convey1.gif' %}" alt="GIF Image" class="gif-image" id="image">
+        <label class="label" id = "ugolL">0.0000</label>
+    </div>
+    <div class="container6">
+        <img src="{% static 'mazut1.png' %}" alt="Image" class="mazut-image" id="mazut-image">
+        <label class="label_mazut" id = "mazutL">0.0000</label>
+    </div>
+</div>
+<div class="kotel-container">
+    <div id="container7">
+        <img src="{% static 'kotel.png' %}" class="kotel_image">
+    </div>
+    <div class="bar">
+        <div class="fill" id="tempBar"></div>
+    </div>
+    <div id="container8">
+        <img src="{% static 'kotel.png' %}" class="kotel_image2">
+    </div>
+    <div id="container9">
+        <img src="{% static 'kotel.png' %}" class="kotel_image3">
+        <img src="{% static 'GlIU.gif' %}" alt="GIF Image" class="f1" id="f31">
+        <img src="{% static 'GlIU.gif' %}" alt="GIF Image" class="f2" id="f32">
+        <img src="{% static 'GlIU.gif' %}" alt="GIF Image" class="f3" id="f33">
+        <img src="{% static 'GlIU.gif' %}" alt="GIF Image" class="f4" id="f34">
+    </div>
+</div>
+<div class="tub-container">
+    <img src="{% static 'turbineoff.jpeg' %}" class="turbine1" id="turbine1">
+    <img src="{% static 'turbineoff.jpeg' %}" class="turbine2" id="turbine2">
+</div>
+</body>
+</html>

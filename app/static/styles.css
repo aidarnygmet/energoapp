@@ -11,10 +11,27 @@
     background-color: #f2f2f2;
     color: #333;
   }
-  
-  /* Container styling */
 
-  .grid-container {
+  /* Container styling */
+  .container4 {
+    display: grid;
+    grid-template-areas:
+    'item8 item9 item10'
+    ;
+    padding: 20px;
+    grid-gap: 10px;
+  }
+  .item8{
+    grid-area: item8;
+  }
+  .item9{
+    grid-area: item9;
+  }
+  .item10{
+    grid-area: item10;
+  }
+  
+  .container {
     display: grid;
     grid-template-areas:
     'item1 item2'
@@ -28,23 +45,28 @@
     padding: 10px;
     display: grid;
     grid-template-areas:
-    'ugol ugol ugol ugol'
-    't_p_h_l t_p_h inc dec'
-    'totalL total total total'
-    'start start start start';
+    'ugol'
+    'tons_p_h'
+    'totals';
   grid-gap: 10px;
   }
+
   .item2 {
     grid-area: item2;
     display: grid;
     border: 1px solid #000;
     padding: 10px;
     grid-template-areas:
-    'mazut mazut mazut mazut'
-    't_p_h_l2 t_p_h2 inc2 dec2'
-    'totalL2 total2 total2 total2'
-    'start2 start2 start2 start2';
+    'mazut '
+    'mazut_p_h'
+    'totals2 ';
   grid-gap: 10px;
+  }
+  .mazut_p_h{
+    grid-area: mazut_p_h;
+  }
+  .tons_p_h{
+    grid-area: tons_p_h;
   }
   .ugol{
     grid-area: ugol;
@@ -52,51 +74,12 @@
   .mazut{
     grid-area: mazut;
   }
-  .t_p_h_l{
-    grid-area: t_p_h_l;
+  .totals{
+    grid-area: totals;
   }
-  .t_p_h{
-    grid-area: t_p_h;
+  .totals2{
+    grid-area: totals2;
   }
-  .inc{
-    grid-area: inc;
-  }
-  .dec{
-    grid-area: dec;
-  }
-  .totalL{
-    grid-area: totalL;
-  }
-  .total{
-    grid-area: total;
-  }
-  .start{
-    width: 100px;
-    grid-area: start;
-  }
-  .t_p_h_l2{
-    grid-area: t_p_h_l2;
-  }
-  .t_p_h2{
-    grid-area: t_p_h2;
-  }
-  .inc2{
-    grid-area: inc2;
-  }
-  .dec2{
-    grid-area: dec2;
-  }
-  .totalL2{
-    grid-area: totalL2;
-  }
-  .total2{
-    grid-area: total2;
-  }
-  .start2{
-    grid-area: start2;
-    width: 100px;
-  }
-
   .container2 {
     display: grid;
     grid-template-areas:
@@ -111,10 +94,13 @@
     border: 1px solid #000;
     padding: 10px;
     grid-template-areas:
-    'kotel1 kotel1 kotel1 kotel1'
-    'k_p_h_l k_p_h inc_k dec_k'
-    'k_totalL k_total k_total k_total'
-    'start_k start_k start_k start_k';
+    'kotel'
+    'ugols'
+    'mazuts'
+    'k_p_h'
+    'totals'
+    'fakels'
+    'startB';
   grid-gap: 10px;
   }
   .item4 {
@@ -123,10 +109,13 @@
     border: 1px solid #000;
     padding: 10px;
     grid-template-areas:
-    'kotel2 kotel2 kotel2 kotel2'
-    'k_p_h_l2 k_p_h2 inc_k2 dec_k2'
-    'k_totalL2 k_total2 k_total2 k_total2'
-    'start_k2 start_k2 start_k2 start_k2';
+    'kotel'
+    'ugols'
+    'mazuts'
+    'k_p_h'
+    'totals'
+    'fakels'
+    'startB';
   grid-gap: 10px;
   }
   .item5 {
@@ -135,87 +124,35 @@
     border: 1px solid #000;
     padding: 10px;
     grid-template-areas:
-    'kotel3 kotel3 kotel3 kotel3'
-    'k_p_h_l3 k_p_h3 inc_k3 dec_k3'
-    'k_totalL3 k_total3 k_total3 k_total3'
-    'start_k3 start_k3 start_k3 start_k3';
+    'kotel'
+    'ugols'
+    'mazuts'
+    'k_p_h'
+    'totals'
+    'fakels'
+    'startB';
   grid-gap: 10px;
   }
-  .k_p_h_l{
-    grid-area: k_p_h_l;
+  .fakels{
+    grid-area: fakels;
+  }
+  .ugols{
+    grid-area: ugols;
+  }
+  .mazuts{
+    grid-area: mazuts;
   }
   .k_p_h{
     grid-area: k_p_h;
   }
-  .inc_k{
-    grid-area: inc_k;
+  .totals{
+    grid-area: totals;
   }
-  .dec_k{
-    grid-area: dec_k;
-  }
-  .k_totalL{
-    grid-area: k_totalL;
-  }
-  .k_total{
-    grid-area: k_total;
-  }
-  .start_k{
-    grid-area: start_k;
+  .startB{
+    grid-area: startB;
     width: 100px;
   }
-  .k_p_h_l2{
-    grid-area: k_p_h_l2;
-  }
-  .k_p_h2{
-    grid-area: k_p_h2;
-  }
-  .inc_k2{
-    grid-area: inc_k2;
-  }
-  .dec_k2{
-    grid-area: dec_k2;
-  }
-  .k_totalL2{
-    grid-area: k_totalL2;
-  }
-  .k_total2{
-    grid-area: k_total2;
-  }
-  .start_k2{
-    grid-area: start_k2;
-    width: 100px;
-  }
-  .k_p_h_l3{
-    grid-area: k_p_h_l3;
-  }
-  .k_p_h3{
-    grid-area: k_p_h3;
-  }
-  .inc_k3{
-    grid-area: inc_k3;
-  }
-  .dec_k3{
-    grid-area: dec_k3;
-  }
-  .k_totalL3{
-    grid-area: k_totalL3;
-  }
-  .k_total3{
-    grid-area: k_total3;
-  }
-  .start_k3{
-    grid-area: start_k3;
-    width: 100px;
-  }
-  .kotel1{
-    grid-area: kotel1;
-  }
-  .kotel2{
-    grid-area: kotel2;
-  }
-  .kotel3{
-    grid-area: kotel3;
-  }
+
   .container3 {
     display: grid;
     grid-template-areas:
@@ -230,22 +167,25 @@
     border: 1px solid #000;
     padding: 10px;
     grid-template-areas:
-    'tur1 tur1 tur1 tur1'
-    'mWL mW incmW decmW'
-    'e_totalL e_total e_total e_total'
-    'start_t start_t start_t start_t';
+    'tur'
+    'par'
+    'energy'
+    'start_t';
   grid-gap: 10px;
   }
+
+  
+  
   .item7 {
     grid-area: item7;
     display: grid;
     border: 1px solid #000;
     padding: 10px;
     grid-template-areas:
-    'tur2 tur2 tur2 tur2'
-    'mWL2 mW2 incmW2 decmW2'
-    'e_totalL2 e_total2 e_total2 e_total2'
-    'start_t2 start_t2 start_t2 start_t2';
+    'tur'
+    'par'
+    'energy'
+    'start_t';
   grid-gap: 10px;
   }
   .tur1{
@@ -333,7 +273,31 @@
     cursor: pointer;
     transition: background-color 0.3s;
   }
-  
+  .fakel {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #ff0000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .fakel:hover {
+    background-color: #8b0000;
+  }
+  .z {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #ff0000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
   .button:hover {
     background-color: #0056b3;
   }

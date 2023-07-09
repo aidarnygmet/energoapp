@@ -6,42 +6,139 @@
   
   <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
   <script>
-    var intervalId = null; 
+    var interval = []
+    for(var i=0; i<12; i++){
+      interval[i] = null;
+    }
     var runningTotal = 0;
-    var interval2Id = null; 
     var mazutTotal = 0;
-    var interval3Id = null; 
     var kotel1Total = 0;
-    var interval4Id = null; 
     var kotel2Total = 0;
-    var interval5Id = null; 
     var kotel3Total = 0;
-    var interval6Id = null; 
     var eTotal = 0;
-    var interval7Id = null; 
     var e2Total = 0;
-    var intervalData = null;
-    function getCookie(name) {
-  const cookieValue = document.cookie
-    .split('; ')
-    .find(row => row.startsWith(name + '='))
-    ?.split('=')[1];
-  return cookieValue ? decodeURIComponent(cookieValue) : null;
-}
-
+    var activeFakels = 0;
+    var activeFakels2 = 0;
+    var activeFakels3 = 0;
+    var temp = 25;
+    var tempC = 0;
+    var pr_val = 0;
+    var temp2 = 25;
+    var tempC2 = 0;
+    var pr_val2 = 0;
+    var temp3 = 25;
+    var tempC3 = 0;
+    var pr_val3 = 0;
+    var currentStatus = 0;
+    var currentStatus2 = 0;
+    var currentStatus3 = 0;
+    var firsttime=0;
+    var firsttime2=0;
+    var firsttime3=0;
+    var objectId
+    var objectId3
+    var objectId2
+    var totalPar = 0;
+    var activeTur = 0;
+    var waste = 0;
     function sendDataToServer() {
       label = document.getElementById("t_total")
-      const value = parseFloat(label.textContent); // Replace with your actual float value
-      const csrftoken = getCookie('csrftoken');
+      const value = parseFloat(label.textContent); 
       const data = {
         value: value
       };
-      console.log(JSON.stringify(data))
       fetch('/save-data/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+      console.log('Data saved successfully!');
+    } else {
+      console.error('Failed to save data:', result.message);
+    }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+    function sendKotelStatus(id, status){
+      const currentTime = new Date();
+      const data = {
+        id: id,
+        status: status,
+        begin: currentTime.toISOString()
+      }
+      fetch('/save-kotel-status/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (id === 1){
+          objectId = result.object_id;
+        } else if(id === 2){
+          objectId2 = result.object_id;
+        }else if(id === 3){
+          objectId3 = result.object_id;
+        }
+
+        
+      })
+      .catch(error =>{
+        console.error('Error:', error)
+      });
+    }
+    function updateKotelStatus(dataId, id, status){
+      const currentTime = new Date();
+      const updatedData = {
+      kotel_id: id,
+      kotel_status: status,
+      end: currentTime.toISOString()
+      };
+      fetch(`/update-kotel-status/${dataId}/`, {
+      method: 'PUT', // or 'POST' if your backend handles updates with POST
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedData)
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result); // Handle the response from the backend
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    }
+    function saveKotelInfo(id, ugol_con, mazut_con, currentTemp, goalTemp, pres, time, parProd, parTotal, status, f1,f2,f3,f4){
+      const data = {
+        kotel_id: id,
+        ugol_con: ugol_con,
+        mazut_con: mazut_con,
+        temp: currentTemp,
+        goal_temp: goalTemp,
+        pressure: pres,
+        time: time,
+        par: parProd,
+        parTotal: parTotal,
+        status: status,
+        f1: f1,
+        f2: f2,
+        f3: f3,
+        f4: f4
+      };
+      fetch('/save-kotel-info/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(data),
       })
@@ -58,252 +155,855 @@
         });
     }
     function handleButtonClick() {
-      var startButton = document.getElementById("start_button");
       var tonsPerHourInput = document.getElementById("t_per_h");
       var tonsTotalLabel = document.getElementById("t_total");
-      if (intervalId) {
-        // If the interval is already running, stop it
-        clearInterval(intervalId);
-        clearInterval(intervalData)
-        intervalId = null;
-        startButton.textContent = "Start"; // Update button label
-        tonsPerHourInput.disabled = false;
-      } else {
-        tonsPerHourInput.disabled = true;
-        if (tonsPerHourInput.value === '') {
-          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
-        }
-        sendDataToServer();
-        
-        intervalId = setInterval(function() {
-          var tonsPerHour = parseFloat(tonsPerHourInput.value);
-          runningTotal += tonsPerHour/3600; 
-          tonsTotalLabel.textContent = runningTotal.toFixed(4);
-        }, 1000);
-        intervalData = setInterval(sendDataToServer, 60000);
-
-        startButton.textContent = "Stop"; 
+      tonsPerHourInput.disabled = true;
+      if (tonsPerHourInput.value === '') {
+        tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
       }
+      var image = { image: 1 };
+      localStorage.setItem('imageChange', JSON.stringify(image));
+      sendDataToServer();  
+      interval[0] = setInterval(function() {
+        var tonsPerHour = parseFloat(tonsPerHourInput.value);
+        runningTotal += tonsPerHour/3600; 
+        tonsTotalLabel.textContent = runningTotal.toFixed(4);
+        const dataToSend = { ugol: runningTotal };
+        localStorage.setItem('data', JSON.stringify(dataToSend));
+      }, 1000);
+      interval[7] = setInterval(sendDataToServer, 60000);
     }
     function handleMazutClick() {
-      var startButton = document.getElementById("start_button2");
       var tonsPerHourInput = document.getElementById("t_per_h2");
       var tonsTotalLabel = document.getElementById("t_total2");
-      if (interval2Id) {
-        // If the interval is already running, stop it
-        clearInterval(interval2Id);
-        interval2Id = null;
-        startButton.textContent = "Start"; // Update button label
-        tonsPerHourInput.disabled = false;
-      } else {
-        tonsPerHourInput.disabled = true;
-        if (tonsPerHourInput.value === '') {
-          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
-        }
-        interval2Id = setInterval(function() {
-          var tonsPerHour = parseFloat(tonsPerHourInput.value);
-          mazutTotal += tonsPerHour/3600; 
-          tonsTotalLabel.textContent = mazutTotal.toFixed(4);
-        }, 1000);
-
-        startButton.textContent = "Stop"; 
+      tonsPerHourInput.disabled = true;
+      if (tonsPerHourInput.value === '') {
+        tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
       }
+      
+      interval[1] = setInterval(function() {
+        var image = { image: 1 };
+      localStorage.setItem('imageMazut', JSON.stringify(image));
+      var tonsPerHour = parseFloat(tonsPerHourInput.value);
+      mazutTotal += tonsPerHour/3600; 
+      tonsTotalLabel.textContent = mazutTotal.toFixed(4);
+      const dataToSend = { mazut: mazutTotal };
+        localStorage.setItem('mazut', JSON.stringify(dataToSend));
+        if( tonsPerHour === 0){
+          image = { image: 0 };
+          localStorage.setItem('imageMazut', JSON.stringify(image));
+        }
+      }, 1000);
+      interval[11] = setInterval(function(){
+        
+        if(interval[2]){
+          var id = 1;
+          var ugol_con_label = document.getElementById("ugol_con")
+          var ugol_con = parseFloat(ugol_con_label.value)
+          var mazut_con_label = document.getElementById("mazut_con")
+          var mazut_con = parseFloat(mazut_con_label.value)
+          var parProdLabel = document.getElementById("k_per_h")
+          var parprod = parseFloat(parProdLabel.value)
+          var tempLabel = document.getElementById("temp")
+          var temP = parseFloat(tempLabel.textContent)
+          var goaltempLabel = document.getElementById("goal_temp")
+          var goaltemP = parseFloat(goaltempLabel.value)
+          var presLabel = document.getElementById("pr")
+          var pres = parseFloat(presLabel.textContent)
+          var timeLabel = document.getElementById("goal_time")
+          var ttime = parseFloat(timeLabel.value)
+          var k_totalL = document.getElementById("k_total")
+          var k_total = parseFloat(k_totalL.textContent);
+          var f1B = document.getElementById("f1")
+          var f2B = document.getElementById("f2")
+          var f3B = document.getElementById("f3")
+          var f4B = document.getElementById("f4")
+          var fakelder = []
+          if(f1B.style.backgroundColor === "red"){
+            fakelder[0] = 0
+          } else {
+            fakelder[0] = 1
+          }
+          if(f2B.style.backgroundColor === "red"){
+            fakelder[1] = 0
+          } else {
+            fakelder[1] = 1
+          }
+          if(f3B.style.backgroundColor === "red"){
+            fakelder[2] = 0
+          } else {
+            fakelder[2] = 1
+          }
+          if(f4B.style.backgroundColor === "red"){
+            fakelder[3] = 0
+          } else {
+            fakelder[3] = 1
+          }
+          saveKotelInfo(1, ugol_con, mazut_con, temP, goaltemP, pres, ttime, parprod, k_total, currentStatus, fakelder[0],
+          fakelder[1], fakelder[2], fakelder[3])
+        }
+        if(interval[3]){
+          var id = 2;
+          var ugol_con_label = document.getElementById("ugol_con2")
+          var ugol_con = parseFloat(ugol_con_label.value)
+          var mazut_con_label = document.getElementById("mazut_con2")
+          var mazut_con = parseFloat(mazut_con_label.value)
+          var parProdLabel = document.getElementById("k_per_h2")
+          var parprod = parseFloat(parProdLabel.value)
+          var tempLabel = document.getElementById("temp2")
+          var temP = parseFloat(tempLabel.textContent)
+          var goaltempLabel = document.getElementById("goal_temp2")
+          var goaltemP = parseFloat(goaltempLabel.value)
+          var presLabel = document.getElementById("pr2")
+          var pres = parseFloat(presLabel.textContent)
+          var timeLabel = document.getElementById("goal_time2")
+          var ttime = parseFloat(timeLabel.value)
+          var k_totalL = document.getElementById("k_total2")
+          var k_total = parseFloat(k_totalL.textContent);
+          var f1B = document.getElementById("f21")
+          var f2B = document.getElementById("f22")
+          var f3B = document.getElementById("f23")
+          var f4B = document.getElementById("f24")
+          var fakelder = []
+          if(f1B.style.backgroundColor === "red"){
+            fakelder[0] = 0
+          } else {
+            fakelder[0] = 1
+          }
+          if(f2B.style.backgroundColor === "red"){
+            fakelder[1] = 0
+          } else {
+            fakelder[1] = 1
+          }
+          if(f3B.style.backgroundColor === "red"){
+            fakelder[2] = 0
+          } else {
+            fakelder[2] = 1
+          }
+          if(f4B.style.backgroundColor === "red"){
+            fakelder[3] = 0
+          } else {
+            fakelder[3] = 1
+          }
+          saveKotelInfo(2, ugol_con, mazut_con, temP, goaltemP, pres, ttime, parprod, k_total, currentStatus2, fakelder[0],
+          fakelder[1], fakelder[2], fakelder[3])
+        }
+        if(interval[4]){
+          var id = 3;
+          var ugol_con_label = document.getElementById("ugol_con3")
+          var ugol_con = parseFloat(ugol_con_label.value)
+          var mazut_con_label = document.getElementById("mazut_con3")
+          var mazut_con = parseFloat(mazut_con_label.value)
+          var parProdLabel = document.getElementById("k_per_h3")
+          var parprod = parseFloat(parProdLabel.value)
+          var tempLabel = document.getElementById("temp3")
+          var temP = parseFloat(tempLabel.textContent)
+          var goaltempLabel = document.getElementById("goal_temp3")
+          var goaltemP = parseFloat(goaltempLabel.value)
+          var presLabel = document.getElementById("pr3")
+          var pres = parseFloat(presLabel.textContent)
+          var timeLabel = document.getElementById("goal_time3")
+          var ttime = parseFloat(timeLabel.value)
+          var k_totalL = document.getElementById("k_total3")
+          var k_total = parseFloat(k_totalL.textContent);
+          var f1B = document.getElementById("f31")
+          var f2B = document.getElementById("f32")
+          var f3B = document.getElementById("f33")
+          var f4B = document.getElementById("f34")
+          var fakelder = []
+          if(f1B.style.backgroundColor === "red"){
+            fakelder[0] = 0
+          } else {
+            fakelder[0] = 1
+          }
+          if(f2B.style.backgroundColor === "red"){
+            fakelder[1] = 0
+          } else {
+            fakelder[1] = 1
+          }
+          if(f3B.style.backgroundColor === "red"){
+            fakelder[2] = 0
+          } else {
+            fakelder[2] = 1
+          }
+          if(f4B.style.backgroundColor === "red"){
+            fakelder[3] = 0
+          } else {
+            fakelder[3] = 1
+          }
+          saveKotelInfo(3, ugol_con, mazut_con, temP, goaltemP, pres, ttime, parprod, k_total, currentStatus3, fakelder[0],
+          fakelder[1], fakelder[2], fakelder[3])
+        }
+      }, 10000)
+      
     }
     function handleKotel1Click() {
       var startButton = document.getElementById("start_k_button");
       var tonsPerHourInput = document.getElementById("k_per_h");
       var tonsTotalLabel = document.getElementById("k_total");
-      if (interval3Id) {
-        // If the interval is already running, stop it
-        clearInterval(interval3Id);
-        interval3Id = null;
-        startButton.textContent = "Start"; // Update button label
-        tonsPerHourInput.disabled = false;
-      } else if(intervalId){
-        tonsPerHourInput.disabled = true;
-        if (tonsPerHourInput.value === '') {
-          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+      var mazutInput = document.getElementById("t_per_h2");
+      var ugolInput = document.getElementById("t_per_h")
+      var ugol_con = document.getElementById("ugol_con")
+      var mazut_con = document.getElementById("mazut_con")
+      var mazut_con = document.getElementById("mazut_con")
+      var goal_temp = document.getElementById("goal_temp")
+      var goal_time = document.getElementById("goal_time")
+      var tempL = document.getElementById("temp")
+      var fakel = []
+        fakel[0] = document.getElementById("f1");
+        fakel[1] = document.getElementById("f2");
+        fakel[2] = document.getElementById("f3");
+        fakel[3] = document.getElementById("f4");
+      if (interval[2]) {
+        var anime = { dur: parseInt(goal_time.value), pressed:1 };
+        localStorage.setItem('anime', JSON.stringify(anime));
+        console.log(anime)
+        var z = document.getElementById("z1")
+        z.style.backgroundColor = "red"
+        updateKotelStatus(objectId, 1, currentStatus)
+        currentStatus = 0;
+        sendKotelStatus(1, currentStatus);
+        clearInterval(interval[2]);
+        clearInterval(interval[8]);
+        interval[8] = null;
+        interval[2] = null;
+        startButton.textContent = "Start"; 
+        fakel[0].style.backgroundColor = "red";
+        fakel[1].style.backgroundColor = "red";
+        fakel[2].style.backgroundColor = "red";
+        fakel[3].style.backgroundColor = "red";
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazutInput.value)
+        mazut_con.value="0.00"
+        mazutInput.value = (currentValue_total_con - currentValue_con).toFixed(2); 
+        var currentValue = parseFloat(ugol_con.value)
+        var currentValue_total = parseFloat(ugolInput.value)
+        ugol_con.value = "0.00"
+        ugolInput.value = (currentValue_total - currentValue).toFixed(2); 
+        var currentVal = parseFloat(tonsPerHourInput.value);
+        totalPar -= currentVal
+        adjustTurbines();
+        tonsPerHourInput.value = "0.00"
+        if(!interval[2] && !interval[3] && !interval[4]){
+          image = { image: 0 };
+          localStorage.setItem('imageChange', JSON.stringify(image));
+          localStorage.setItem('imageMazut', JSON.stringify(image));
+          clearInterval(interval[0])
+          interval[0] = null;
+          clearInterval(interval[1])
+          interval[1] = null;
+          clearInterval(interval[7])
+          interval[7] = null;
         }
-        interval3Id = setInterval(function() {
+        interval[8] = setInterval(cooldownTemp, 1000);
+        
+      } else {
+        
+        if(ugol_con.value === '' || ugol_con.value == "0.00"){
+          ugol_con.value = '17.00'
+        }
+        if(mazut_con.value === '' || mazut_con.value == "0.00"){
+          mazut_con.value = '7.00'
+        }
+        if(ugolInput.value ===''){
+            ugolInput.value = '0.00';
+          }
+        if(mazutInput.value === ''){
+            mazutInput.value = '0.00'
+        }
+        if(goal_time.value === ''){
+            goal_time.value = '1'
+        }
+        if(goal_temp.value === ''){
+            goal_temp.value = '540'
+        }
+        
+        var currentValue = parseFloat(ugolInput.value);
+        var ugol_con_val = parseFloat(ugol_con.value);
+        ugolInput.value = (currentValue + ugol_con_val).toFixed(2);
+        
+        var currentValue_maz = parseFloat(mazutInput.value);
+        var mazut_con_val = parseFloat(mazut_con.value);
+        mazutInput.value = (currentValue_maz + mazut_con_val).toFixed(2);
+        
+        fakel[0].style.backgroundColor = "green";
+        fakel[1].style.backgroundColor = "green";
+        fakel[2].style.backgroundColor = "green";
+        fakel[3].style.backgroundColor = "green";
+        var image = { image: 1 };
+        localStorage.setItem('f11', JSON.stringify(image));
+        localStorage.setItem('f12', JSON.stringify(image));
+        localStorage.setItem('f13', JSON.stringify(image));
+        localStorage.setItem('f14', JSON.stringify(image));
+        var anime = { dur: parseInt(goal_time.value), pressed:0 };
+        localStorage.setItem('anime', JSON.stringify(anime));
+        activeFakels = 4;
+        tonsPerHourInput.disabled = true;
+        ugol_con.disabled = true;
+        mazut_con.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; 
+        }
+        interval[2] = setInterval(function() {
           var tonsPerHour = parseFloat(tonsPerHourInput.value);
           kotel1Total += tonsPerHour/3600; 
           tonsTotalLabel.textContent = kotel1Total.toFixed(4);
         }, 1000);
-
         startButton.textContent = "Stop"; 
+        clearInterval(interval[8]);
+        interval[8] = setInterval(updateTemp, 1000);
+        if(firsttime != 0){
+          updateKotelStatus(objectId,1, currentStatus)
+        }
+        if(!interval[0]){
+          handleButtonClick()
+        }
+        if(!interval[1]){
+          handleMazutClick()
+        }
+        firsttime = 1;
+        currentStatus = 1;
+        sendKotelStatus(1, currentStatus);
       }
+      
     }
     function handleKotel2Click() {
       var startButton = document.getElementById("start_k_button2");
       var tonsPerHourInput = document.getElementById("k_per_h2");
       var tonsTotalLabel = document.getElementById("k_total2");
-      if (interval4Id) {
-        // If the interval is already running, stop it
-        clearInterval(interval4Id);
-        interval4Id = null;
-        startButton.textContent = "Start"; // Update button label
+      var mazutInput = document.getElementById("t_per_h2");
+      var ugolInput = document.getElementById("t_per_h")
+      var ugol_con = document.getElementById("ugol_con2")
+      var mazut_con = document.getElementById("mazut_con2")
+      var goal_temp = document.getElementById("goal_temp2")
+      var goal_time = document.getElementById("goal_time2")
+      var tempL = document.getElementById("temp2")
+      var fakel = []
+        fakel[0] = document.getElementById("f21");
+        fakel[1] = document.getElementById("f22");
+        fakel[2] = document.getElementById("f23");
+        fakel[3] = document.getElementById("f24");
+      if (interval[3]) {
+        var z = document.getElementById("z2")
+        z.style.backgroundColor = "red"
+        updateKotelStatus(objectId2, 2, currentStatus2)
+        currentStatus2 = 0;
+        sendKotelStatus(2, currentStatus2);
+        clearInterval(interval[3]);
+        interval[3] = null;
+        clearInterval(interval[9]);
+        interval[9] = null;
+        startButton.textContent = "Start"; 
         tonsPerHourInput.disabled = false;
-      } else if(intervalId){
-        tonsPerHourInput.disabled = true;
-        if (tonsPerHourInput.value === '') {
-          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+        ugol_con.disabled = false;
+        mazut_con.disabled = false;
+        fakel[0].style.backgroundColor = "red";
+        fakel[1].style.backgroundColor = "red";
+        fakel[2].style.backgroundColor = "red";
+        fakel[3].style.backgroundColor = "red";
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazutInput.value)
+        mazut_con.value="0.00"
+        mazutInput.value = (currentValue_total_con - currentValue_con).toFixed(2); 
+        var currentValue = parseFloat(ugol_con.value)
+        var currentValue_total = parseFloat(ugolInput.value)
+        ugol_con.value = "0.00"
+        ugolInput.value = (currentValue_total - currentValue).toFixed(2); 
+        var currentVal = parseFloat(tonsPerHourInput.value);
+        totalPar -= currentVal
+        adjustTurbines();
+        tonsPerHourInput.value = "0.00"
+        if(!interval[2] && !interval[3] && !interval[4]){
+          image = { image: 0 };
+          localStorage.setItem('imageChange', JSON.stringify(image));
+          localStorage.setItem('imageMazut', JSON.stringify(image));
+          clearInterval(interval[0])
+          interval[0] = null;
+          clearInterval(interval[1])
+          interval[1] = null;
+          clearInterval(interval[7])
+          interval[7] = null;
         }
-        interval4Id = setInterval(function() {
+        interval[9] = setInterval(cooldownTemp2, 1000);
+      } else {
+        if(ugol_con.value === '' || ugol_con.value == "0.00"){
+          ugol_con.value = '17.00'
+        }
+        if(mazut_con.value === '' || mazut_con.value == "0.00"){
+          mazut_con.value = '7.00'
+        }
+        if(ugolInput.value ===''){
+            ugolInput.value = '0.00';
+          }
+          if(mazutInput.value === ''){
+            mazutInput.value = '0.00'
+          }
+          if(goal_time.value === ''){
+            goal_time.value = '1'
+        }
+        if(goal_temp.value === ''){
+            goal_temp.value = '540'
+        }
+        var currentValue = parseFloat(ugolInput.value);
+        var ugol_con_val = parseFloat(ugol_con.value);
+        ugolInput.value = (currentValue + ugol_con_val).toFixed(2);
+        if(!interval[0]){
+          handleButtonClick()
+        }
+        if(!interval[1]){
+          handleMazutClick()
+        }
+        var currentValue_maz = parseFloat(mazutInput.value);
+        var mazut_con_val = parseFloat(mazut_con.value);
+        mazutInput.value = (currentValue_maz + mazut_con_val).toFixed(2);
+        
+        fakel[0].style.backgroundColor = "green";
+        fakel[1].style.backgroundColor = "green";
+        fakel[2].style.backgroundColor = "green";
+        fakel[3].style.backgroundColor = "green";
+        activeFakels2 = 4;
+        tonsPerHourInput.disabled = true;
+        ugol_con.disabled = true;
+        mazut_con.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; 
+        }
+        interval[3] = setInterval(function() {
           var tonsPerHour = parseFloat(tonsPerHourInput.value);
           kotel2Total += tonsPerHour/3600; 
           tonsTotalLabel.textContent = kotel2Total.toFixed(4);
         }, 1000);
-
         startButton.textContent = "Stop"; 
+        if(firsttime2 != 0){
+          updateKotelStatus(objectId2, 2, currentStatus2)
+        }
+        firsttime2 = 1;
+        currentStatus2 = 1;
+        sendKotelStatus(2, currentStatus2);
+        clearInterval(interval[9]);
+        interval[9] = setInterval(updateTemp2, 1000);
       }
     }
     function handleKotel3Click() {
       var startButton = document.getElementById("start_k_button3");
       var tonsPerHourInput = document.getElementById("k_per_h3");
       var tonsTotalLabel = document.getElementById("k_total3");
-      if (interval5Id) {
-        // If the interval is already running, stop it
-        clearInterval(interval5Id);
-        interval5Id = null;
-        startButton.textContent = "Start"; // Update button label
+      var mazutInput = document.getElementById("t_per_h2");
+      var ugolInput = document.getElementById("t_per_h")
+      var ugol_con = document.getElementById("ugol_con3")
+      var mazut_con = document.getElementById("mazut_con3")
+      var goal_temp = document.getElementById("goal_temp3")
+      var goal_time = document.getElementById("goal_time3")
+      var tempL = document.getElementById("temp3")
+      var fakel = []
+        fakel[0] = document.getElementById("f31");
+        fakel[1] = document.getElementById("f32");
+        fakel[2] = document.getElementById("f33");
+        fakel[3] = document.getElementById("f34");
+      if (interval[4]) {
+        var z = document.getElementById("z3")
+        z.style.backgroundColor = "red"
+        
+        updateKotelStatus(objectId3, 3, currentStatus3)
+        currentStatus3 = 0;
+        sendKotelStatus(3, currentStatus3);
+        clearInterval(interval[4]);
+        interval[4] = null;
+        clearInterval(interval[10]);
+        interval[10] = null;
+        startButton.textContent = "Start"; 
         tonsPerHourInput.disabled = false;
-      } else if(intervalId){
-        tonsPerHourInput.disabled = true;
-        if (tonsPerHourInput.value === '') {
-          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
+        ugol_con.disabled = false;
+        mazut_con.disabled = false;
+        fakel[0].style.backgroundColor = "red";
+        fakel[1].style.backgroundColor = "red";
+        fakel[2].style.backgroundColor = "red";
+        fakel[3].style.backgroundColor = "red";
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazutInput.value)
+        mazut_con.value="0.00"
+        mazutInput.value = (currentValue_total_con - currentValue_con).toFixed(2); 
+        var currentValue = parseFloat(ugol_con.value)
+        var currentValue_total = parseFloat(ugolInput.value)
+        ugol_con.value = "0.00"
+        ugolInput.value = (currentValue_total - currentValue).toFixed(2); 
+        var currentVal = parseFloat(tonsPerHourInput.value);
+        totalPar -= currentVal
+        adjustTurbines();
+        tonsPerHourInput.value = "0.00"
+        if(!interval[2] && !interval[3] && !interval[4]){
+          image = { image: 0 };
+          localStorage.setItem('imageChange', JSON.stringify(image));
+          localStorage.setItem('imageMazut', JSON.stringify(image));
+          clearInterval(interval[0])
+          interval[0] = null;
+          clearInterval(interval[1])
+          interval[1] = null;
+          clearInterval(interval[7])
+          interval[7] = null;
         }
-        interval5Id = setInterval(function() {
+        interval[10] = setInterval(cooldownTemp3, 1000);
+      } else {
+        if(ugol_con.value === '' || ugol_con.value == "0.00"){
+          ugol_con.value = '17.00'
+        }
+        if(mazut_con.value === '' || mazut_con.value == "0.00"){
+          mazut_con.value = '7.00'
+        }
+        if(ugolInput.value ===''){
+            ugolInput.value = '0.00';
+          }
+          if(mazutInput.value === ''){
+            mazutInput.value = '0.00'
+          }
+          if(goal_time.value === ''){
+            goal_time.value = '1'
+        }
+        if(goal_temp.value === ''){
+            goal_temp.value = '540'
+        }
+        var currentValue = parseFloat(ugolInput.value);
+        var ugol_con_val = parseFloat(ugol_con.value);
+        ugolInput.value = (currentValue + ugol_con_val).toFixed(2);
+        if(!interval[0]){
+          handleButtonClick()
+        }
+        if(!interval[1]){
+          handleMazutClick()
+        }
+        var currentValue_maz = parseFloat(mazutInput.value);
+        var mazut_con_val = parseFloat(mazut_con.value);
+        mazutInput.value = (currentValue_maz + mazut_con_val).toFixed(2);
+        
+        fakel[0].style.backgroundColor = "green";
+        fakel[1].style.backgroundColor = "green";
+        fakel[2].style.backgroundColor = "green";
+        fakel[3].style.backgroundColor = "green";
+        activeFakels3 = 4;
+        tonsPerHourInput.disabled = true;
+        ugol_con.disabled = true;
+        mazut_con.disabled = true;
+        if (tonsPerHourInput.value === '') {
+          tonsPerHourInput.value = '0.00'; 
+        }
+        interval[4] = setInterval(function() {
           var tonsPerHour = parseFloat(tonsPerHourInput.value);
           kotel3Total += tonsPerHour/3600; 
           tonsTotalLabel.textContent = kotel3Total.toFixed(4);
         }, 1000);
-
         startButton.textContent = "Stop"; 
+        if(firsttime3 != 0){
+          updateKotelStatus(objectId3, 3, currentStatus3)
+        }
+        firsttime3 = 1;
+        currentStatus3 = 1;
+        sendKotelStatus(3, currentStatus3);
+        clearInterval(interval[10])
+        interval[10] = setInterval(updateTemp3, 1000);
+        
       }
+    }
+    function updateTemp(){
+      var tempL = document.getElementById("temp")
+      var time = document.getElementById("goal_time")
+      var pr = document.getElementById("pr")
+      var goal_temp_L = document.getElementById("goal_temp")
+      var par = document.getElementById("k_per_h")
+      var z = document.getElementById("z1")
+      var goal_temp = parseFloat(goal_temp_L.value)
+      pr_val = pr_val +(100)/ (parseFloat(time.value) * 60)
+      temp = temp +(goal_temp-25)/ (parseFloat(time.value) * 60)
+      
+      if(temp > goal_temp){
+        clearInterval(interval[8]);
+        handleF1Click();
+        handleF2Click();
+        handleF3Click();
+        handleF4Click();
+        updateKotelStatus(objectId, 1, currentStatus)
+        currentStatus = 2;
+        sendKotelStatus(1, currentStatus);
+        par.value = (160).toFixed(2)
+        totalPar +=160;
+        z.style.backgroundColor = "green"
+        adjustTurbines();
+        
+        return;
+      }
+      pr.textContent = pr_val.toFixed(2)
+      tempL.textContent = (temp).toFixed(2)
+      
+    }
+    function adjustTurbines(){
+      var t1 = document.getElementById("mW");
+      var t2 = document.getElementById("mW2");
+      var mw = document.getElementById("actualMW");
+      var mw2 = document.getElementById("actualMW2");
+      var tpLabel = document.getElementById("totalParLabel");
+      var wLabel = document.getElementById("extraParLabel");
+      tpLabel.textContent = totalPar.toFixed(2)
+      
+      if(activeTur == 2){
+        t1.value = (totalPar/activeTur).toFixed(2);
+        t2.value = (totalPar/activeTur).toFixed(2);
+        var power = ((totalPar/activeTur)/240) * 75;
+        mw.value = power.toFixed(2)
+        var power2 = ((totalPar/activeTur)/240) * 75;
+        mw2.value = power2.toFixed(2)
+        waste = 0;
+        wLabel.textContent = waste.toFixed(2)
+      } else if(interval[5]){
+        t1.value = (totalPar/activeTur).toFixed(2);
+        t2.value = "0.00"
+        if(parseFloat(t1.value)>240){
+          t1.value = (240).toFixed(2)
+          mw.value = (75).toFixed(2)
+          waste = totalPar - 240
+          wLabel.textContent = waste.toFixed(2)
+        } else {
+          var power = ((totalPar/activeTur)/240) * 75;
+          mw.value = power.toFixed(2)
+          t1.value = totalPar.toFixed(2)
+          wLabel.textContent = "0.00"
+        }
+      } else if(interval[6]){
+        t1.value = "0.00"
+        t2.value = (totalPar/activeTur).toFixed(2);
+        if(parseFloat(t2.value)>240){
+          mw2.value = (75).toFixed(2)
+          t2.value = (240).toFixed(2)
+          waste = totalPar - 240
+          wLabel.textContent = waste.toFixed(2)
+        } else {
+          t2.value = totalPar.toFixed(2)
+          var power = ((totalPar/activeTur)/240) * 75;
+          mw2.value = power.toFixed(2)
+          wLabel.textContent = "0.00"
+        }
+      } else {
+        waste = totalPar;
+        wLabel.textContent = waste.toFixed(2)
+      }
+      
+    }
+    function updateTemp2(){
+      var tempL = document.getElementById("temp2")
+      var time = document.getElementById("goal_time2")
+      var pr = document.getElementById("pr2")
+      var goal_temp_L = document.getElementById("goal_temp2")
+      var par = document.getElementById("k_per_h2")
+      var z = document.getElementById("z2")
+      var goal_temp = parseFloat(goal_temp_L.value)
+      pr_val2 = pr_val2 +(100)/ (parseFloat(time.value) * 60)
+      temp2 = temp2 +(goal_temp-25)/ (parseFloat(time.value) * 60)
+      if(temp2 > goal_temp){
+        clearInterval(interval[9]);
+        handleF1Click2();
+        handleF2Click2();
+        handleF3Click2();
+        handleF4Click2();
+        updateKotelStatus(objectId2, 2, currentStatus2)
+        currentStatus = 2;
+        par.value = (160).toFixed(2)
+        sendKotelStatus(2, currentStatus2);
+        z.style.backgroundColor = "green"
+        totalPar +=160;
+        adjustTurbines();
+        return;
+      }
+      pr.textContent = pr_val2.toFixed(2)
+      tempL.textContent = (temp2).toFixed(2)
+    }
+    function updateTemp3(){
+      var tempL = document.getElementById("temp3")
+      var time = document.getElementById("goal_time3")
+      var pr = document.getElementById("pr3")
+      var goal_temp_L = document.getElementById("goal_temp3")
+      var par = document.getElementById("k_per_h3")
+      var goal_temp = parseFloat(goal_temp_L.value)
+      var z = document.getElementById("z3")
+      pr_val3 = pr_val3 +(100)/ (parseFloat(time.value) * 60)
+      temp3 = temp3 +(goal_temp-25)/ (parseFloat(time.value) * 60)
+      if(temp3 > goal_temp){
+        clearInterval(interval[10]);
+        handleF1Click3();
+        handleF2Click3();
+        handleF3Click3();
+        handleF4Click3();
+        par.value = (160).toFixed(2)
+        updateKotelStatus(objectId3, 3, currentStatus3)
+        currentStatus3 = 2;
+        sendKotelStatus(3, currentStatus3);
+        z.style.backgroundColor = "green"
+        totalPar +=160;
+        adjustTurbines();
+        return;
+      }
+      pr.textContent = pr_val3.toFixed(2)
+      tempL.textContent = (temp3).toFixed(2)
+    }
+    function cooldownTemp(){
+      var tempL = document.getElementById("temp")
+      var time = document.getElementById("goal_time")
+      var pr = document.getElementById("pr")
+      var goal_temp_L = document.getElementById("goal_temp")
+      var goal_temp = parseFloat(goal_temp_L.value)
+      pr_val = pr_val -(100)/ (parseFloat(time.value) * 60)
+      temp = temp -(goal_temp-25)/ (parseFloat(time.value) * 60)
+      if(pr_val<0){
+        pr_val = 0
+      }
+      if(temp < 25){
+        clearInterval(interval[8]);
+        return;
+      }
+      pr.textContent = pr_val.toFixed(2)
+      tempL.textContent = (temp).toFixed(2)
+    }
+    function cooldownTemp2(){
+      var tempL = document.getElementById("temp2")
+      var time = document.getElementById("goal_time2")
+      var pr = document.getElementById("pr2")
+      var goal_temp_L = document.getElementById("goal_temp2")
+      var goal_temp = parseFloat(goal_temp_L.value)
+      pr_val2 = pr_val2 -(100)/ (parseFloat(time.value) * 60)
+      temp2 = temp2 -(goal_temp-25)/ (parseFloat(time.value) * 60)
+      if(pr_val2<0){
+        pr_val2 = 0
+      }
+      if(temp2 < 25){
+        clearInterval(interval[9]);
+        return;
+      }
+      pr.textContent = pr_val2.toFixed(2)
+      tempL.textContent = (temp2).toFixed(2)
+    }
+    function cooldownTemp3(){
+      var tempL = document.getElementById("temp3")
+      var time = document.getElementById("goal_time3")
+      var pr = document.getElementById("pr3")
+      var goal_temp_L = document.getElementById("goal_temp3")
+      var goal_temp = parseFloat(goal_temp_L.value)
+      pr_val3 = pr_val3 -(100)/ (parseFloat(time.value) * 60)
+      temp3 = temp3 -(goal_temp-25)/ (parseFloat(time.value) * 60)
+      if(pr_val3<0){
+        pr_val3 = 0
+      }
+      if(temp3 < 25){
+        clearInterval(interval[10]);
+        return;
+      }
+      pr.textContent = pr_val3.toFixed(2)
+      tempL.textContent = (temp3).toFixed(2)
     }
     function handleTurClick() {
       var startButton = document.getElementById("start_t_button");
       var tonsPerHourInput = document.getElementById("mW");
+      var mwperhour = document.getElementById("actualMW");
+      var tonsPerHourInput2 = document.getElementById("mW2");
       var tonsTotalLabel = document.getElementById("e_total");
-      if (interval6Id) {
+      if (interval[5]) {
         // If the interval is already running, stop it
-        clearInterval(interval6Id);
-        interval6Id = null;
+        clearInterval(interval[5]);
+        interval[5] = null;
         startButton.textContent = "Start"; // Update button label
         tonsPerHourInput.disabled = false;
+        mwperhour.value = "0.00";
+        activeTur-=1
+        adjustTurbines();
       } else {
         tonsPerHourInput.disabled = true;
-        if (tonsPerHourInput.value === '') {
-          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
-        }
-        interval6Id = setInterval(function() {
-          var tonsPerHour = parseFloat(tonsPerHourInput.value);
-          eTotal += tonsPerHour/3600; 
+        tonsPerHourInput.value = "0.00";
+        mwperhour.value = "0.00";
+        interval[5] = setInterval(function() {
+          var tonsPerHour = parseFloat(mwperhour.value);
+          eTotal += (tonsPerHour*1000)/3600; 
           tonsTotalLabel.textContent = eTotal.toFixed(4);
         }, 1000);
-
+        activeTur+=1;
         startButton.textContent = "Stop"; 
+        adjustTurbines();
       }
     }
     function handleTur2Click() {
       var startButton = document.getElementById("start_t_button2");
       var tonsPerHourInput = document.getElementById("mW2");
+      var mwperhour = document.getElementById("actualMW2");
       var tonsTotalLabel = document.getElementById("e_total2");
-      if (interval7Id) {
+      if (interval[6]) {
         // If the interval is already running, stop it
-        clearInterval(interval7Id);
-        interval7Id = null;
+        clearInterval(interval[6]);
+        mwperhour.value = "0.00";
+        interval[6] = null;
         startButton.textContent = "Start"; // Update button label
         tonsPerHourInput.disabled = false;
+        activeTur-=1
+        adjustTurbines();
       } else {
+        
         tonsPerHourInput.disabled = true;
-        if (tonsPerHourInput.value === '') {
-          tonsPerHourInput.value = '0.00'; // Initialize as 0 if no value is provided
-        }
-        interval7Id = setInterval(function() {
-          var tonsPerHour = parseFloat(tonsPerHourInput.value);
-          e2Total += tonsPerHour/3600; 
+        interval[6] = setInterval(function() {
+          var tonsPerHour = parseFloat(mwperhour.value);
+          e2Total += (tonsPerHour*1000)/3600; 
           tonsTotalLabel.textContent = e2Total.toFixed(4);
         }, 1000);
-
+        activeTur+=1;
         startButton.textContent = "Stop"; 
-      }
-    }
-    function handleIncreaseClick() {
-      var tonsPerHourInput = document.getElementById("t_per_h");
-
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
-        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
-      }
-    }
-    function handleDecreaseClick() {
-      var tonsPerHourInput = document.getElementById("t_per_h");
-
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
-        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
-      }
-    }
-    function handleIncrease2Click() {
-      var tonsPerHourInput = document.getElementById("t_per_h2");
-
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
-        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
-      }
-    }
-    function handleDecrease2Click() {
-      var tonsPerHourInput = document.getElementById("t_per_h2");
-
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
-        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+        adjustTurbines();
       }
     }
     function handleIncrease1_k_Click() {
       var tonsPerHourInput = document.getElementById("k_per_h");
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
+      var currentValue = parseFloat(tonsPerHourInput.value);
+      if (interval[2] && currentValue + 1 <=160) {
+        totalPar += 1
         tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+        adjustTurbines();
       }
     }
     function handleDecrease1_k_Click() {
       var tonsPerHourInput = document.getElementById("k_per_h");
-
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
+      var currentValue = parseFloat(tonsPerHourInput.value);
+      if (interval[2] && currentValue - 1 > 0) {
+        totalPar -= 1
         tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+        adjustTurbines();
       }
     }
     function handleIncrease2_k_Click() {
       var tonsPerHourInput = document.getElementById("k_per_h2");
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
+      var currentValue = parseFloat(tonsPerHourInput.value);
+      if (interval[3] && currentValue + 1 <=160) {
+        totalPar += 1
         tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+        adjustTurbines();
       }
     }
     function handleDecrease2_k_Click() {
       var tonsPerHourInput = document.getElementById("k_per_h2");
-
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
+      var currentValue = parseFloat(tonsPerHourInput.value);
+      if (interval[3] && currentValue - 1 > 0) {
+        totalPar -= 1
         tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+        adjustTurbines();
       }
-    }
+    } 
     function handleIncrease3_k_Click() {
       var tonsPerHourInput = document.getElementById("k_per_h3");
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
+      var currentValue = parseFloat(tonsPerHourInput.value);
+      if (interval[4] && currentValue + 1 <=160) {
+        totalPar += 1
         tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+        adjustTurbines();
       }
     }
     function handleDecrease3_k_Click() {
       var tonsPerHourInput = document.getElementById("k_per_h3");
-
-      if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
+      var currentValue = parseFloat(tonsPerHourInput.value);
+      if (interval[4] && currentValue - 1 > 0) {
+        totalPar -= 1
         tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+        adjustTurbines();
       }
     }
     function handleIncrease_mW_Click() {
@@ -338,152 +1038,857 @@
       }
       
     }
+    function handleIncreaseUClick(){
+      var ugol_con = document.getElementById("ugol_con");
+      var ugol_total_con = document.getElementById("t_per_h")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      ugol_con.value = (currentValue_con + 1).toFixed(2)
+      ugol_total_con.value = (currentValue_total_con + 1).toFixed(2)
+    }
+    function handleDecreaseUClick(){
+      var ugol_con = document.getElementById("ugol_con");
+      var ugol_total_con = document.getElementById("t_per_h")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      if(currentValue_con - 1 >= 0){
+        ugol_con.value = (currentValue_con - 1).toFixed(2)
+        ugol_total_con.value = (currentValue_total_con - 1).toFixed(2)
+      }
+      
+    }
+    function handleIncreaseMClick(){
+      var ugol_con = document.getElementById("mazut_con");
+      var ugol_total_con = document.getElementById("t_per_h2")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      ugol_con.value = (currentValue_con + 0.5).toFixed(2)
+      ugol_total_con.value = (currentValue_total_con + 0.5).toFixed(2)
+    }
+    function handleDecreaseMClick(){
+      var ugol_con = document.getElementById("mazut_con");
+      var ugol_total_con = document.getElementById("t_per_h2")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      if(currentValue_con - 0.5 >= 0){
+        ugol_con.value = (currentValue_con - 0.5).toFixed(2)
+        ugol_total_con.value = (currentValue_total_con - 0.5).toFixed(2)
+      }
+    }
+    function handleF1Click(){
+      var button = document.getElementById("f1");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con");
+      if(interval[2]){
+        if(button.style.backgroundColor === "green"){
+        var image = { image: 0 };
+        localStorage.setItem('f11', JSON.stringify(image));
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels = activeFakels-1
+      } else {
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+        localStorage.setItem('f11', JSON.stringify(image));
+        if(activeFakels === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels = activeFakels+1
+      }
+      }
+    }
+    function handleF2Click(){
+      var button = document.getElementById("f2");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con");
+      if(interval[2]){
+        if(button.style.backgroundColor === "green"){
+        var image = { image: 0 };
+        localStorage.setItem('f12', JSON.stringify(image));
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels = activeFakels-1
+      } else {
+        var image = { image: 1 };
+        localStorage.setItem('f12', JSON.stringify(image));
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels = activeFakels+1
+      }
+      }
+    }
+    function handleF3Click(){
+      var button = document.getElementById("f3");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con");
+      if(interval[2]){
+        if(button.style.backgroundColor === "green"){
+        var image = { image: 0 };
+        localStorage.setItem('f13', JSON.stringify(image));
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels = activeFakels-1
+      } else {
+        var image = { image: 1 };
+        localStorage.setItem('f13', JSON.stringify(image));
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels = activeFakels+1
+      }
+      }
+    }
+    function handleF4Click(){
+      var button = document.getElementById("f4");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con");
+      if(interval[2]){
+        if(button.style.backgroundColor === "green"){
+        var image = { image: 0 };
+        localStorage.setItem('f14', JSON.stringify(image));
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels = activeFakels-1
+      } else {
+        var image = { image: 1 };
+        localStorage.setItem('f14', JSON.stringify(image));
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels = activeFakels+1
+      }
+      }
+    }
+    function handleIncreaseUClick2(){
+      var ugol_con = document.getElementById("ugol_con2");
+      var ugol_total_con = document.getElementById("t_per_h")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      ugol_con.value = (currentValue_con + 1).toFixed(2)
+      ugol_total_con.value = (currentValue_total_con + 1).toFixed(2)
+    }
+    function handleDecreaseUClick2(){
+      var ugol_con = document.getElementById("ugol_con2");
+      var ugol_total_con = document.getElementById("t_per_h")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      if(currentValue_con - 1 >= 0){
+        ugol_con.value = (currentValue_con - 1).toFixed(2)
+        ugol_total_con.value = (currentValue_total_con - 1).toFixed(2)
+      }
+      
+    }
+    function handleIncreaseMClick2(){
+      var ugol_con = document.getElementById("mazut_con2");
+      var ugol_total_con = document.getElementById("t_per_h2")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      ugol_con.value = (currentValue_con + 0.5).toFixed(2)
+      ugol_total_con.value = (currentValue_total_con + 0.5).toFixed(2)
+    }
+    function handleDecreaseMClick2(){
+      var ugol_con = document.getElementById("mazut_con2");
+      var ugol_total_con = document.getElementById("t_per_h2")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      if(currentValue_con - 0.5 >= 0){
+        ugol_con.value = (currentValue_con - 0.5).toFixed(2)
+        ugol_total_con.value = (currentValue_total_con - 0.5).toFixed(2)
+      }
+    }
+    function handleF1Click2(){
+      var button = document.getElementById("f21");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con2");
+      if(interval[3]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels2 * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels2 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels2 = activeFakels2-1
+      } else {
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels2 === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels2 * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels2 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels2 = activeFakels2+1
+      }
+      }
+      
+    }
+    function handleF2Click2(){
+      var button = document.getElementById("f22");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con2");
+      if(interval[3]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels2 * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels2 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels2 = activeFakels2-1
+      } else {
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels2 === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels2 * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels2 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels2 = activeFakels2+1
+      }
+      }
+    }
+    function handleF3Click2(){
+      var button = document.getElementById("f23");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con2");
+      if(interval[3]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels2 * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels2 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels2 = activeFakels2-1
+      } else {
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels2 === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels2 * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels2 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels2 = activeFakels2+1
+      }
+      }
+    }
+    function handleF4Click2(){
+      var button = document.getElementById("f24");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con2");
+      if(interval[3]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels2 * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels2 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels2 = activeFakels2-1
+      } else {
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels2 === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels2 * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels2 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels2 = activeFakels2+1
+      }
+      }
+    }
+    function handleClearClick(){
+      location.reload();
+      localStorage.clear();
+    //   if(interval[2]){
+    //     handleKotel1Click();
+    //   }
+    //   if(interval[3]){
+    //     handleKotel2Click();
+    //   }
+    //   if(interval[4]){
+    //     handleKotel3Click();
+    //   }
+    //   clearInterval(interval[8]);
+      
+    //   runningTotal = 0;
+    //   mazutTotal = 0;
+    //   kotel1Total = 0;
+    //   kotel2Total = 0;
+    //   kotel3Total = 0;
+    //   eTotal = 0;
+    //   e2Total = 0;
+    //   temp = 25;
+    //   pr_val = 0;
+    //   temp2 = 25;
+    //   pr_val2 = 0;
+    //   temp3 = 25;
+    //   pr_val3 = 0;
+    //   var labels = [];
+    //   labels[0] = document.getElementById("t_total");
+    //   labels[1] = document.getElementById("t_total2");
+    //   labels[2] = document.getElementById("k_total");
+    //   labels[3] = document.getElementById("k_total2");
+    //   labels[4] = document.getElementById("k_total3");
+    //   labels[5] = document.getElementById("e_total");
+    //   labels[6] = document.getElementById("e_total2");
+    //   labels[7] = document.getElementById("temp");
+    //   labels[8] = document.getElementById("pr");
+    //   labels[9] = document.getElementById("temp2");
+    //   labels[10] = document.getElementById("pr2");
+    //   labels[11] = document.getElementById("temp3");
+    //   labels[12] = document.getElementById("pr3");
+    //   var speeds = [];
+    //   speeds[0] = document.getElementById("t_per_h");
+    //   speeds[1] = document.getElementById("t_per_h2");
+    //   speeds[2] = document.getElementById("k_per_h");
+    //   speeds[3] = document.getElementById("k_per_h2");
+    //   speeds[4] = document.getElementById("k_per_h3");
+    //   speeds[5] = document.getElementById("mW");
+    //   speeds[6] = document.getElementById("mW2");
+    //   speeds[7] = document.getElementById("ugol_con");
+    //   speeds[8] = document.getElementById("mazut_con");
+    //   speeds[9] = document.getElementById("ugol_con2");
+    //   speeds[10] = document.getElementById("mazut_con2");
+    //   speeds[11] = document.getElementById("ugol_con3");
+    //   speeds[12] = document.getElementById("mazut_con3");
+    //   speeds[13] = document.getElementById("goal_temp");
+    //   speeds[14] = document.getElementById("goal_time");
+    //   speeds[15] = document.getElementById("goal_temp2");
+    //   speeds[16] = document.getElementById("goal_time2");
+    //   speeds[17] = document.getElementById("goal_temp3");
+    //   speeds[18] = document.getElementById("goal_time3");
+    //   for(var i=0; i<19; i++){
+    //     if(i<7){
+    //       labels[i].textContent = 0
+    //     }
+        
+    //     speeds[i].value = ""
+    //     speeds[i].disabled = false
+    //   }
+    //   labels[7].textContent = "25"
+    // labels[8].textContent = "0"
+    // labels[9].textContent = "25"
+    // labels[10].textContent = "0"
+    // labels[11].textContent = "25"
+    // labels[12].textContent = "0"
+    }
     
+    function handleIncreaseUClick3(){
+      var ugol_con = document.getElementById("ugol_con3");
+      var ugol_total_con = document.getElementById("t_per_h")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      ugol_con.value = (currentValue_con + 1).toFixed(2)
+      ugol_total_con.value = (currentValue_total_con + 1).toFixed(2)
+    }
+    function handleDecreaseUClick3(){
+      var ugol_con = document.getElementById("ugol_con3");
+      var ugol_total_con = document.getElementById("t_per_h")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      if(currentValue_con - 1 >= 0){
+        ugol_con.value = (currentValue_con - 1).toFixed(2)
+        ugol_total_con.value = (currentValue_total_con - 1).toFixed(2)
+      }
+      
+    }
+    function handleIncreaseMClick3(){
+      var ugol_con = document.getElementById("mazut_con3");
+      var ugol_total_con = document.getElementById("t_per_h2")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      ugol_con.value = (currentValue_con + 0.5).toFixed(2)
+      ugol_total_con.value = (currentValue_total_con + 0.5).toFixed(2)
+    }
+    function handleDecreaseMClick3(){
+      var ugol_con = document.getElementById("mazut_con3");
+      var ugol_total_con = document.getElementById("t_per_h2")
+      var currentValue_con = parseFloat(ugol_con.value)
+      var currentValue_total_con = parseFloat(ugol_total_con.value)
+      if(currentValue_con - 0.5 >= 0){
+        ugol_con.value = (currentValue_con - 0.5).toFixed(2)
+        ugol_total_con.value = (currentValue_total_con - 0.5).toFixed(2)
+      }
+    }
+    function handleF1Click3(){
+      var button = document.getElementById("f31");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con3");
+      if(interval[4]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels3 * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels3 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels3 = activeFakels3-1
+      } else {
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels3 === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels3 * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels3 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels3 = activeFakels3+1
+      }
+      }
+      
+    }
+    function handleF2Click3(){
+      var button = document.getElementById("f32");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con3");
+      if(interval[4]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels3 * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels3 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels3 = activeFakels3-1
+      } else {
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels2 === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels3 * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels3 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels3 = activeFakels3+1
+      }
+      }
+    }
+    function handleF3Click3(){
+      var button = document.getElementById("f33");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con3");
+      if(interval[4]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels3 * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels3 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels3 = activeFakels3-1
+      } else {
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels3 === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels3 * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels3 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels3 = activeFakels3+1
+      }
+      }
+    }
+    function handleF4Click3(){
+      var button = document.getElementById("f34");
+      var mazut_con_total = document.getElementById("t_per_h2");
+      var mazut_con = document .getElementById("mazut_con3");
+      if(interval[4]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        mazut_con.value = (currentValue_con - 1/activeFakels3 * currentValue_con).toFixed(2)
+        mazut_con_total.value = (currentValue_total_con - 1/activeFakels3 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeFakels3 = activeFakels3-1
+      } else {
+        var currentValue_con = parseFloat(mazut_con.value)
+        var currentValue_total_con = parseFloat(mazut_con_total.value)
+        if(activeFakels2 === 0){
+          mazut_con.value = (7/4).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
+        } else {
+          mazut_con.value = (currentValue_con + 1/activeFakels3 * currentValue_con).toFixed(2)
+          mazut_con_total.value = (currentValue_total_con + 1/activeFakels3 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeFakels3 = activeFakels3+1
+      }
+      }
+    }
     // Add event listeners when the DOM is loaded
     document.addEventListener("DOMContentLoaded", function() {
-      var startButton = document.getElementById("start_button");
-      var increaseButton = document.getElementById("increase");
-      var decreaseButton = document.getElementById("decrease");
-      var startMazut = document.getElementById("start_button2");
-      var increaseButton2 = document.getElementById("increase2");
-      var decreaseButton2 = document.getElementById("decrease2");
-      var startKotel1 = document.getElementById("start_k_button");
-      var increase_k_button1 = document.getElementById("increase_k");
-      var decrease_k_button1 = document.getElementById("decrease_k");
-      var startKotel2 = document.getElementById("start_k_button2");
-      var increase_k_button2 = document.getElementById("increase2_k");
-      var decrease_k_button2 = document.getElementById("decrease2_k");
-      var startKotel3 = document.getElementById("start_k_button3");
-      var increase_k_button3 = document.getElementById("increase3_k");
-      var decrease_k_button3 = document.getElementById("decrease3_k");
-      var starttur = document.getElementById("start_t_button");
-      var increase_mW_button = document.getElementById("increasemW");
-      var decrease_mW_button = document.getElementById("decreasemW");
-      var starttur2 = document.getElementById("start_t_button2");
-      var increase_mW2_button = document.getElementById("increasemW2");
-      var decrease_mW2_button = document.getElementById("decreasemW2");
-      startButton.addEventListener("click", handleButtonClick);
-      increaseButton.addEventListener("click", handleIncreaseClick);
-      decreaseButton.addEventListener("click", handleDecreaseClick);
-      startMazut.addEventListener("click", handleMazutClick);
-      increaseButton2.addEventListener("click", handleIncrease2Click);
-      decreaseButton2.addEventListener("click", handleDecrease2Click);
-      startKotel1.addEventListener("click", handleKotel1Click);
-      increase_k_button1.addEventListener("click", handleIncrease1_k_Click);
-      decrease_k_button1.addEventListener("click", handleDecrease1_k_Click);
-      startKotel2.addEventListener("click", handleKotel2Click);
-      increase_k_button2.addEventListener("click", handleIncrease2_k_Click);
-      decrease_k_button2.addEventListener("click", handleDecrease2_k_Click);
-      startKotel3.addEventListener("click", handleKotel3Click);
-      increase_k_button3.addEventListener("click", handleIncrease3_k_Click);
-      decrease_k_button3.addEventListener("click", handleDecrease3_k_Click);
+    var startKotel1 = document.getElementById("start_k_button");
+    var increase_k_button1 = document.getElementById("increase_k");
+    var decrease_k_button1 = document.getElementById("decrease_k");
+    var increase_u_con = document.getElementById("increase_u");
+    var decrease_u_con = document.getElementById("decrease_u");
+    var increase_m_con = document.getElementById("increase_m");
+    var decrease_m_con = document.getElementById("decrease_m");
+    var fakel = []
+      fakel[0] = document.getElementById("f1");
+      fakel[1] = document.getElementById("f2");
+      fakel[2] = document.getElementById("f3");
+      fakel[3] = document.getElementById("f4");
+
+    var startKotel2 = document.getElementById("start_k_button2");
+    var increase_k_button2 = document.getElementById("increase2_k");
+    var decrease_k_button2 = document.getElementById("decrease2_k");
+    var increase_u_con2 = document.getElementById("increase_u2");
+    var decrease_u_con2 = document.getElementById("decrease_u2");
+    var increase_m_con2 = document.getElementById("increase_m2");
+    var decrease_m_con2 = document.getElementById("decrease_m2");
+    var fakel2 = []
+      fakel2[0] = document.getElementById("f21");
+      fakel2[1] = document.getElementById("f22");
+      fakel2[2] = document.getElementById("f23");
+      fakel2[3] = document.getElementById("f24");
+
+    var startKotel3 = document.getElementById("start_k_button3");
+    var increase_k_button3 = document.getElementById("increase_k3");
+    var decrease_k_button3 = document.getElementById("decrease_k3");
+    var increase_u_con3 = document.getElementById("increase_u3");
+    var decrease_u_con3 = document.getElementById("decrease_u3");
+    var increase_m_con3 = document.getElementById("increase_m3");
+    var decrease_m_con3 = document.getElementById("decrease_m3");
+    var fakel3 = []
+      fakel3[0] = document.getElementById("f31");
+      fakel3[1] = document.getElementById("f32");
+      fakel3[2] = document.getElementById("f33");
+      fakel3[3] = document.getElementById("f34");
+
+    var starttur = document.getElementById("start_t_button");
+    var increase_mW_button = document.getElementById("increasemW");
+    var decrease_mW_button = document.getElementById("decreasemW");
+
+    var starttur2 = document.getElementById("start_t_button2");
+    var increase_mW2_button = document.getElementById("increasemW2");
+    var decrease_mW2_button = document.getElementById("decreasemW2");
+
+    var clear_button = document.getElementById("clear");
+      
+    startKotel1.addEventListener("click", handleKotel1Click);
+    increase_k_button1.addEventListener("click", handleIncrease1_k_Click);
+    decrease_k_button1.addEventListener("click", handleDecrease1_k_Click);
+    increase_u_con.addEventListener("click", handleIncreaseUClick);
+    decrease_u_con.addEventListener("click", handleDecreaseUClick);
+    increase_m_con.addEventListener("click", handleIncreaseMClick);
+    decrease_m_con.addEventListener("click", handleDecreaseMClick);
+    fakel[0].addEventListener("click", handleF1Click);
+    fakel[1].addEventListener("click", handleF2Click);
+    fakel[2].addEventListener("click", handleF3Click);
+    fakel[3].addEventListener("click", handleF4Click);
+
+    startKotel2.addEventListener("click", handleKotel2Click);
+    increase_k_button2.addEventListener("click", handleIncrease2_k_Click);
+    decrease_k_button2.addEventListener("click", handleDecrease2_k_Click);
+    increase_u_con2.addEventListener("click", handleIncreaseUClick2);
+    decrease_u_con2.addEventListener("click", handleDecreaseUClick2);
+    increase_m_con2.addEventListener("click", handleIncreaseMClick2);
+    decrease_m_con2.addEventListener("click", handleDecreaseMClick2);
+    fakel2[0].addEventListener("click", handleF1Click2);
+    fakel2[1].addEventListener("click", handleF2Click2);
+    fakel2[2].addEventListener("click", handleF3Click2);
+    fakel2[3].addEventListener("click", handleF4Click2);
+      
+    startKotel3.addEventListener("click", handleKotel3Click);
+    increase_k_button3.addEventListener("click", handleIncrease3_k_Click);
+    decrease_k_button3.addEventListener("click", handleDecrease3_k_Click);
+    increase_u_con3.addEventListener("click", handleIncreaseUClick3);
+    decrease_u_con3.addEventListener("click", handleDecreaseUClick3);
+    increase_m_con3.addEventListener("click", handleIncreaseMClick3);
+    decrease_m_con3.addEventListener("click", handleDecreaseMClick3);
+    fakel3[0].addEventListener("click", handleF1Click3);
+    fakel3[1].addEventListener("click", handleF2Click3);
+    fakel3[2].addEventListener("click", handleF3Click3);
+    fakel3[3].addEventListener("click", handleF4Click3);
+
+
+    clear_button.addEventListener("click", handleClearClick);
+      
+      
       starttur.addEventListener("click", handleTurClick);
       increase_mW_button.addEventListener("click", handleIncrease_mW_Click);
       decrease_mW_button.addEventListener("click", handleDecrease_mW_Click);
       starttur2.addEventListener("click", handleTur2Click);
       increase_mW2_button.addEventListener("click", handleIncrease_mW2_Click);
       decrease_mW2_button.addEventListener("click", handleDecrease_mW2_Click);
+      
     });
   </script>
 </head>
 <body>
   <h1>Sample Sections</h1>
-
-  <!-- Section 1 -->
-
-
-    
- 
-    <div class="grid-container">
+  <div>
+    <button class = "button" id = "clear">Clear</button>
+    <a href="{% url 'demo' %}" class="button">Presentation</a>
+  </div>
+    <div class="container">
       <div class="item1">
         <div class="ugol">Ugol</div>
-        <label class="t_p_h_l">Tons per hour</label>
-        <input type="text" class="input t_p_h" id="t_per_h">
-        <button class= "button inc" id="increase">+</button>
-        <button class= "button dec" id="decrease">-</button>
-        <div>
-            <label class="label totalL">Tons total</label>
-            <label class="total" id="t_total">0</label>
+        <div class = "tons_p_h">
+          <label>Tons per hour</label>
+          <input type="text" class="input" style="width: 50px;" id="t_per_h" disabled>
+          
+          
         </div>
-        <button class= "button start" id="start_button">Start</button>
+        <div class="totals">
+            <label>Tons total</label>
+            <label id="t_total" style="font-weight: bold;">0</label>
+            
+        </div>
       </div>
       <div class="item2">
         <div class="mazut">Mazut</div>
-        <label class="t_p_h_l2">Tons per hour</label>
-        <input type="text" class="input t_p_h2" id="t_per_h2">
-        <button class= "button inc2" id="increase2">+</button>
-        <button class= "button dec2" id="decrease2">-</button>
-        <div>
-            <label class="label totalL2">Tons total</label>
-            <label class="total2" id="t_total2">0</label>
+        <div class = "mazut_p_h">
+          <label">Tons per hour</label>
+          <input type="text" class="input" style="width: 50px;" id="t_per_h2" disabled>
+          
+          
         </div>
-        <button class= "button start2" id="start_button2">Start</button>
+        <div class="totals2">
+            <label>Tons total</label>
+            <label id="t_total2" style="font-weight: bold;">0</label>
+            
+        </div>
       </div>
     </div>
 
     <div class="container2">
-      <div class="item3">
-        <div class="kotel1">Kotel 1</div>
-        <label class="k_p_h_l">Tons per hour</label>
-        <input type="text" class="input k_p_h" id="k_per_h">
-        <button class= "button inc_k" id="increase_k">+</button>
-        <button class= "button dec_k" id="decrease_k">-</button>
-        <div>
-            <label class="label k_totalL">Tons total</label>
-            <label class="k_total" id="k_total">0</label>
+      <div class="item item3">
+        <div class="kotel">Kotel 1</div>
+        <div class="ugols">
+          <label>ugol</label>
+          <input type="text" class="input" style="width: 50px;" id="ugol_con" disabled>
+          <button class= "button" id="increase_u">+</button>
+          <button class= "button" id="decrease_u">-</button>
+          <label>Temp, °C</label>
+          <label id="temp" style="font-weight: bold;"><b>25</b></label>
+          <label>Goal Temp</label>
+          <input type="text" class="input" style="width: 50px;" id="goal_temp">
         </div>
-        <button class= "button start_k" id="start_k_button">Start</button>
+        <div class="mazuts">
+            <label>mazut</label>
+            <input type="text" class="input" style="width: 50px;" id="mazut_con" disabled>
+            <button class= "button" id="increase_m">+</button>
+            <button class= "button" id="decrease_m">-</button>
+            <label>Pressure, Pa</label>
+          <label id="pr" style="font-weight: bold;"><b>0</b></label>
+          <label>Time</label>
+          <input type="text" class="input" style="width: 50px;" id="goal_time">
+        </div>
+        <div class="k_p_h">
+          <label>Tons per hour</label>
+          <input type="text" class="input" style="width: 50px;" id="k_per_h" disabled>
+          <button class= "button" id="increase_k">+</button>
+          <button class= "button" id="decrease_k">-</button>
+        </div>
+        <div class="totals">
+            <label>Tons total</label>
+            <label id="k_total">0</label>
+        </div>
+        <div class="fakels">
+          <button class= "fakel" id="f1">1</button>
+          <button class= "fakel" id="f2">2</button>
+          <button class= "fakel" id="f3">3</button>
+          <button class= "fakel" id="f4">4</button>
+        </div>
+        <div class = "startB"> 
+          <button class= "button" id="start_k_button">Start</button>
+        </div>
       </div>
-      <div class="item4">
-        <div class="kotel2">Kotel 2</div>
-        <label class="k_p_h_l2">Tons per hour</label>
-        <input type="text" class="input k_p_h2" id="k_per_h2">
-        <button class= "button inc_k2" id="increase2_k">+</button>
-        <button class= "button dec_k2" id="decrease2_k">-</button>
-        <div>
-            <label class="label k_totalL2">Tons total</label>
-            <label class="k_total2" id="k_total2">0</label>
+
+      <div class="item item4">
+        <div class="kotel">Kotel 2</div>
+        <div class="ugols">
+          <label>ugol</label>
+          <input type="text" class="input" style="width: 50px;" id="ugol_con2" disabled>
+          <button class= "button" id="increase_u2">+</button>
+          <button class= "button" id="decrease_u2">-</button>
+          <label>Temp, °C</label>
+          <label id="temp2" style="font-weight: bold;"><b>25</b></label>
+          <label>Goal Temp</label>
+          <input type="text" class="input" style="width: 50px;" id="goal_temp2">
         </div>
-        <button class= "button start_k2" id="start_k_button2">Start</button>
+        <div class="mazuts">
+          <label>mazut</label>
+          <input type="text" class="input" style="width: 50px;" id="mazut_con2" disabled>
+          <button class= "button" id="increase_m2">+</button>
+          <button class= "button" id="decrease_m2">-</button>
+          <label>Pressure, Pa</label>
+          <label id="pr2" style="font-weight: bold;"><b>0</b></label>
+          <label>Time</label>
+          <input type="text" class="input" style="width: 50px;" id="goal_time2">
+        </div>
+        <div class="k_p_h">
+          <label>Tons per hour</label>
+          <input type="text" class="input" style="width: 50px;" id="k_per_h2" disabled>
+          <button class= "button" id="increase2_k">+</button>
+          <button class= "button" id="decrease2_k">-</button>
+        </div>
+        <div class="totals">
+            <label>Tons total</label>
+            <label id="k_total2">0</label>
+        </div>
+        <div class="fakels">
+          <button class= "fakel" id="f21">1</button>
+          <button class= "fakel" id="f22">2</button>
+          <button class= "fakel" id="f23">3</button>
+          <button class= "fakel" id="f24">4</button>
+        </div>
+        <div class = "startB"> 
+          <button class= "button" id="start_k_button2">Start</button>
+        </div>
       </div>
-      <div class="item5">
-        <div class="kotel3">Kotel 3</div>
-        <label class="k_p_h_l3">Tons per hour</label>
-        <input type="text" class="input k_p_h3" id="k_per_h3">
-        <button class= "button inc_k3" id="increase3_k">+</button>
-        <button class= "button dec_k3" id="decrease3_k">-</button>
-        <div>
-            <label class="label k_totalL3">Tons total</label>
-            <label class="k_total3" id="k_total3">0</label>
+      
+
+      <div class="item item5">
+        <div class="kotel">Kotel 3</div>
+        <div class="ugols">
+          <label>ugol</label>
+          <input type="text" class="input" style="width: 50px;" id="ugol_con3" disabled>
+          <button class= "button" id="increase_u3">+</button>
+          <button class= "button" id="decrease_u3">-</button>
+          <label>Temp, °C</label>
+          <label id="temp3" style="font-weight: bold;"><b>25</b></label>
+          <label>Goal Temp</label>
+          <input type="text" class="input" style="width: 50px;" id="goal_temp3">
+
         </div>
-        <button class= "button start_k3" id="start_k_button3">Start</button>
+        <div class="mazuts">
+            <label>mazut</label>
+            <input type="text" class="input" style="width: 50px;" id="mazut_con3" disabled>
+            <button class= "button" id="increase_m3">+</button>
+            <button class= "button" id="decrease_m3">-</button>
+            <label>Pressure, Pa</label>
+          <label id="pr3" style="font-weight: bold;"><b>0</b></label>
+          <label>Time</label>
+          <input type="text" class="input" style="width: 50px;" id="goal_time3">
+        </div>
+        <div class="k_p_h">
+          <label>Tons per hour</label>
+          <input type="text" class="input" style="width: 50px;" id="k_per_h3" disabled>
+          <button class= "button" id="increase_k3">+</button>
+          <button class= "button" id="decrease_k3">-</button>
+        </div>
+        <div class="totals">
+            <label>Tons total</label>
+            <label id="k_total3">0</label>
+        </div>
+        <div class="fakels">
+          <button class= "fakel" id="f31">1</button>
+          <button class= "fakel" id="f32">2</button>
+          <button class= "fakel" id="f33">3</button>
+          <button class= "fakel" id="f34">4</button>
+        </div>
+        <div class = "startB"> 
+          <button class= "button" id="start_k_button3">Start</button>
+        </div>
       </div>
     </div>
-  
+    <div class="container4">
+        <div class="item8">
+          <button class= "z" id="z1">Zadvizhka 1</button>
+        </div>
+        <div class="item9">
+          <button class= "z" id="z2">Zadvizhka 2</button>
+        </div>
+        <div class="item10">
+          <button class= "z" id="z3">Zadvizhka 3</button>
+        </div>
+        
+    </div>
+    <div class="labels-container">
+      <label>Total par</label>
+      <label id="totalParLabel">0</label>
+      <label>Лишний пар</label>
+      <label id="extraParLabel">0</label>
+    </div>
     <div class="container3">
       <div class="item6">
-        <div class="tur1">Turbina 1</div>
-        <label class="mWL">mW</label>
-        <input type="text" class="input mW" id="mW">
-        <button class= "button incmW" id="increasemW">+</button>
-        <button class= "button decmW" id="decreasemW">-</button>
-        <div>
-            <label class="label e_totalL">kW-hour</label>
-            <label class="e_total" id="e_total">0</label>
+        <div class="tur">Turbina 1</div>
+        <div class="par">
+        <label class="mWL">Par</label>
+        <input type="text" class="input mW" style="width: 50px;" id="mW" disabled>
+        </div>
+        <div class="energy">
+            
+            <label>MW</label>
+            <input type="text" class="input mW" style="width: 50px;" id="actualMW" disabled>
+            <button class= "button" id="increasemW">+</button>
+            <button class= "button" id="decreasemW">-</button>
+            <label>kW-hour</label>
+            <label id="e_total">0</label>
         </div>
         <button class= "button start_t" id="start_t_button">Start</button>
       </div>
       <div class="item7">
-        <div class="tur2">Turbina 2</div>
-        <label class="mWL2">mW</label>
-        <input type="text" class="input mW2" id="mW2">
-        <button class= "button incmW2" id="increasemW2">+</button>
-        <button class= "button decmW2" id="decreasemW2">-</button>
-        <div>
-            <label class="label e_totalL2">kW-hour</label>
-            <label class="e_total2" id="e_total2">0</label>
+        <div class="tur">Turbina 2</div>
+        <div class="par">
+          <label class="mWL">Par</label>
+          <input type="text" class="input mW" style="width: 50px;" id="mW2" disabled>
+          </div>
+          <div class="energy">
+            <label>MW</label>
+            <input type="text" class="input mW" style="width: 50px;" id="actualMW2" disabled>
+            <button class= "button" id="increasemW2">+</button>
+            <button class= "button" id="decreasemW2">-</button>
+            <label>kW-hour</label>
+            <label id="e_total2">0</label>
         </div>
-        <button class= "button start_t2" id="start_t_button2">Start</button>
+        <button class= "button start_t" id="start_t_button2">Start</button>
       </div>
     </div>
 

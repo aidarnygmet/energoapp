@@ -16,10 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from app.views import save_data
+from app.views import save_data, save_kotel_status, update_kotel_status, save_kotel_info
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('app/', include('app.urls')),
     path('save-data/', save_data, name='save-data'),
+    path('save-kotel-status/', save_kotel_status, name='save_kotel_status'),
+    path('update-kotel-status/<int:object_id>/', update_kotel_status, name='update_kotel_status'),
+    path('save-kotel-info/', save_kotel_info, name='save_kotel_info'), 
 ]
