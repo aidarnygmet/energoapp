@@ -7,6 +7,64 @@
   <link rel="stylesheet" type="text/css" href="{% static 'styles2.css' %}">
   <script>
     var pressed=0;
+    var canvas;
+    var ctx;
+    
+    var lineSegments = [
+        { x1: 1085, y1: 130, x2: 1085, y2: 210, color: "grey" },
+        { x1: 1087, y1: 210, x2: 935, y2: 210, color: "grey" },
+        { x1: 935, y1: 210, x2: 935, y2: 462, color: "grey" },
+        { x1: 935, y1: 460, x2: 1020, y2: 460, color: "grey" },
+        { x1: 935, y1: 210, x2: 485, y2: 210, color: "grey" },
+        { x1: 485, y1: 210, x2: 485, y2: 462, color: "grey" },
+        { x1: 485, y1: 460, x2: 570, y2: 460, color: "grey" },
+        { x1: 485, y1: 210, x2: 33, y2: 210, color: "grey" },
+        { x1: 35, y1: 210, x2: 35, y2: 462, color: "grey" },
+        { x1: 35, y1: 460, x2: 120, y2: 460, color: "grey" },
+        { x1: 600, y1: 130, x2: 600, y2: 230, color: "grey" },
+        { x1: 600, y1: 230, x2: 917, y2: 230, color: "grey" },
+        { x1: 915, y1: 230, x2: 915, y2: 522, color: "grey" },
+        { x1: 915, y1: 520, x2: 1020, y2: 520, color: "grey" },
+        { x1: 600, y1: 230, x2: 465, y2: 230, color: "grey" },
+        { x1: 465, y1: 230, x2: 465, y2: 522, color: "grey" },
+        { x1: 465, y1: 520, x2: 600, y2: 520, color: "grey" },
+        { x1: 465, y1: 230, x2: 13, y2: 230, color: "grey" },
+        { x1: 15, y1: 230, x2: 15, y2: 522, color: "grey" },
+        { x1: 15, y1: 520, x2: 120, y2: 520, color: "grey" },
+
+        { x1: 240, y1: 350, x2: 240, y2: 700, color: "grey" },
+        { x1: 690, y1: 350, x2: 690, y2: 700, color: "grey" },
+        { x1: 1140, y1: 350, x2: 1140, y2: 700, color: "grey" },
+        { x1: 240, y1: 750, x2: 240, y2: 820, color: "grey" },
+        { x1: 690, y1: 750, x2: 690, y2: 820, color: "grey" },
+        { x1: 1140, y1: 750, x2: 1140, y2: 820, color: "grey" },
+        { x1: 690, y1: 820, x2: 1140, y2: 820, color: "grey" },
+        { x1: 240, y1: 820, x2: 690, y2: 820, color: "grey" },
+        { x1: 850, y1: 820, x2: 850, y2: 900, color: "grey" },
+        { x1: 450, y1: 820, x2: 450, y2: 900, color: "grey" },
+      ];
+
+      function drawLineSegment(segment) {
+        ctx.beginPath();
+        ctx.moveTo(segment.x1, segment.y1);
+        ctx.lineTo(segment.x2, segment.y2);
+        ctx.strokeStyle = segment.color;
+        ctx.stroke();
+      }
+
+      function drawLineSegments() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (var i = 0; i < lineSegments.length; i++) {
+          drawLineSegment(lineSegments[i]);
+        }
+      }
+
+      function changeSegmentColor(segmentIndex, color) {
+        lineSegments[segmentIndex].color = color;
+        drawLineSegments();
+      }
+      
     function animate(duration) {
         const start = Date.now();
         function step1() {
@@ -25,7 +83,6 @@
             requestAnimationFrame(step2);
             }
         }
-        console.log("pressed is "+pressed)
         if(pressed === 0){
             requestAnimationFrame(step1);
             pressed =1;
@@ -33,8 +90,7 @@
             requestAnimationFrame(step2);
             pressed=0;
         }
-    }
-    
+    } 
     function setFillHeight(progress) {
         var fillElement = document.querySelector(".fill");
         if(fillElement !== null){
@@ -43,28 +99,118 @@
         } 
         
     }
+    
     var variable=0;
     var variable2=0;
-    var variables = [];
     var variable3 = 0;
+    var variables = []
     for(var i=0; i<4; i++){
-        variables[i] = 0;
+        variables[i]=0;
     }
+    var variables2 = []
+    for(var i=0; i<4; i++){
+        variables2[i]=0;
+    }
+    var variables3 = []
+    for(var i=0; i<4; i++){
+        variables3[i]=0;
+    }
+    var z1=0;
+    var z2=0; 
+    var z3=0;
+    var height =0;
+    var height2 = 0;
+    var height3 = 0;
     setInterval(() => {
     // Fetch the value from the source page
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var progressBar = document.getElementById('tempBar1');
+    var progressBar2 = document.getElementById('tempBar2');
+    var progressBar3 = document.getElementById('tempBar3');
     var dataReceived = JSON.parse(localStorage.getItem('data'));
     var dataReceived3 = JSON.parse(localStorage.getItem('mazut'));
-    var dataReceived6 = JSON.parse(localStorage.getItem('anime'));
-    if(dataReceived6){
-        if(variable3 === 0 && dataReceived6.pressed === 0){
-            animate(dataReceived6.dur*60000)
-            variable3=1;
-        } else if(variable3 === 1 && dataReceived6.pressed === 1){
-            animate(dataReceived6.dur*60000)
-            console.log(dataReceived6.dur*60000)
-            variable3=0;
+    var dataReceived2 = JSON.parse(localStorage.getItem('imageChange'));
+    var dataReceived4 = JSON.parse(localStorage.getItem('imageMazut'));
+    var dataReceived5 = JSON.parse(localStorage.getItem('kotel1'));
+    var dataReceived6 = JSON.parse(localStorage.getItem('kotel2'));
+    var dataReceived7 = JSON.parse(localStorage.getItem('kotel3'));
+    var dataReceived8 = JSON.parse(localStorage.getItem('ugol1'));
+    var dataReceived9 = JSON.parse(localStorage.getItem('ugol2'));
+    var dataReceived10 = JSON.parse(localStorage.getItem('ugol3'));
+    var dataReceived11 = JSON.parse(localStorage.getItem('bar1'));
+    var dataReceived12 = JSON.parse(localStorage.getItem('par'));
+    var dataReceived13 = JSON.parse(localStorage.getItem('bar2'));
+    var dataReceived14 = JSON.parse(localStorage.getItem('par2'));
+    var dataReceived15 = JSON.parse(localStorage.getItem('bar3'));
+    var dataReceived16 = JSON.parse(localStorage.getItem('par3'));
+    var dataReceived17 = [ ]
+    dataReceived17[0] = JSON.parse(localStorage.getItem('g1'));
+    dataReceived17[1] = JSON.parse(localStorage.getItem('g2'));
+    dataReceived17[2] = JSON.parse(localStorage.getItem('g3'));
+    dataReceived17[3] = JSON.parse(localStorage.getItem('g4'));
+    var dataReceived18 = [ ]
+    dataReceived18[0] = JSON.parse(localStorage.getItem('g21'));
+    dataReceived18[1] = JSON.parse(localStorage.getItem('g22'));
+    dataReceived18[2] = JSON.parse(localStorage.getItem('g23'));
+    dataReceived18[3] = JSON.parse(localStorage.getItem('g24'));
+    var dataReceived19 = [ ]
+    dataReceived19[0] = JSON.parse(localStorage.getItem('g31'));
+    dataReceived19[1] = JSON.parse(localStorage.getItem('g32'));
+    dataReceived19[2] = JSON.parse(localStorage.getItem('g33'));
+    dataReceived19[3] = JSON.parse(localStorage.getItem('g34'));
+    var dataReceived20 = JSON.parse(localStorage.getItem('z1'));
+    var dataReceived21 = JSON.parse(localStorage.getItem('z2'));
+    var dataReceived22 = JSON.parse(localStorage.getItem('z3'));
+    var dataReceived23 = JSON.parse(localStorage.getItem('tur1'));
+    var dataReceived24 = JSON.parse(localStorage.getItem('tur2'));
+    var dataReceived25 = JSON.parse(localStorage.getItem('energy1'));
+    var dataReceived26 = JSON.parse(localStorage.getItem('energy2'));
+
+    if(dataReceived5){
+        if(dataReceived5.image === 1){
+            changeSegmentColor(0, "orange");
+            changeSegmentColor(1, "orange");
+            changeSegmentColor(4, "orange");
+            changeSegmentColor(7, "orange");
+            changeSegmentColor(8, "orange");
+            changeSegmentColor(9, "orange");
+        } else {
+            changeSegmentColor(0, "grey");
+            changeSegmentColor(1, "grey");
+            changeSegmentColor(4, "grey");
+            changeSegmentColor(7, "grey");
+            changeSegmentColor(8, "grey");
+            changeSegmentColor(9, "grey");
         }
-        
+    }
+    if(dataReceived6){
+        if(dataReceived6.image === 1){
+            changeSegmentColor(0, "orange");
+            changeSegmentColor(1, "orange");
+            changeSegmentColor(4, "orange");
+            changeSegmentColor(5, "orange");
+            changeSegmentColor(6, "orange");
+        } else {
+            changeSegmentColor(0, "grey");
+            changeSegmentColor(1, "grey");
+            changeSegmentColor(4, "grey");
+            changeSegmentColor(5, "grey");
+            changeSegmentColor(6, "grey");
+        }
+    }
+    if(dataReceived7){
+        if(dataReceived7.image === 1){
+            changeSegmentColor(0, "orange");
+            changeSegmentColor(1, "orange");
+            changeSegmentColor(2, "orange");
+            changeSegmentColor(3, "orange");
+        } else {
+            changeSegmentColor(0, "grey");
+            changeSegmentColor(1, "grey");
+            changeSegmentColor(2, "grey");
+            changeSegmentColor(3, "grey");
+        }
     }
     if(dataReceived){
          document.getElementById("ugolL").textContent = (dataReceived.ugol).toFixed(4)
@@ -72,38 +218,88 @@
     if(dataReceived3){
          document.getElementById("mazutL").textContent = (dataReceived3.mazut).toFixed(4)
     }
-    
-    var dataReceived2 = JSON.parse(localStorage.getItem('imageChange'));
-    var dataReceived4 = JSON.parse(localStorage.getItem('imageMazut'));
-    var dataReceived5 = []
-    dataReceived5[0] = JSON.parse(localStorage.getItem("f11"));
-    dataReceived5[1] = JSON.parse(localStorage.getItem("f12"));
-    dataReceived5[2] = JSON.parse(localStorage.getItem("f13"));
-    dataReceived5[3] = JSON.parse(localStorage.getItem("f14"));
-    for(var i=0; i<4; i++){
-        if(dataReceived5[i]){
-            if(dataReceived5[i].image === 1){
-                if(variables[i] === 0){
-                    var image = document.createElement('img');
-                    image.id = "f1"+(i+1)
-                    image.src = "{% static 'GlIU.gif' %}"
-                    image.classList.add("f"+(i+1));
-                    var container = document.getElementById('container7');
-                    container.appendChild(image);
-                    variables[i] = 1;
-                }
-            } else {
-                if(variables[i]===1){
-                    var img = document.getElementById("f1"+(i+1))
-                    img.remove()
-                    variables[i]=0;
-                    if(i===3){
-                        var turb = document.getElementById("turbine1")
-                        turb.src = "{% static 'turbineon.gif' %}"
-                    }
-                }
-            }
+    if(dataReceived8){
+        if(dataReceived8.image === 1){
+            changeSegmentColor(10, "green");
+            changeSegmentColor(14, "green");
+            changeSegmentColor(17, "green");
+            changeSegmentColor(18, "green");
+            changeSegmentColor(19, "green");
+        } else {
+            changeSegmentColor(10, "grey");
+            changeSegmentColor(14, "grey");
+            changeSegmentColor(17, "grey");
+            changeSegmentColor(18, "grey");
+            changeSegmentColor(19, "grey");
         }
+    }
+    if(dataReceived9){
+        if(dataReceived9.image === 1){
+            changeSegmentColor(10, "green");
+            changeSegmentColor(14, "green");
+            changeSegmentColor(15, "green");
+            changeSegmentColor(16, "green");
+        } else {
+            changeSegmentColor(10, "grey");
+            changeSegmentColor(14, "grey");
+            changeSegmentColor(15, "grey");
+            changeSegmentColor(16, "grey");
+        }
+    }
+    if(dataReceived10){
+        if(dataReceived10.image === 1){
+            changeSegmentColor(10, "green");
+            changeSegmentColor(11, "green");
+            changeSegmentColor(12, "green");
+            changeSegmentColor(13, "green");
+        } else {
+            changeSegmentColor(10, "grey");
+            changeSegmentColor(11, "grey");
+            changeSegmentColor(12, "grey");
+            changeSegmentColor(13, "grey");
+        }
+    }
+    if(dataReceived11){
+        var tempL = document.getElementById("tempL")
+        var prL = document.getElementById("prL")       
+        height = (dataReceived11.t * 245)/dataReceived11.g
+        progressBar.style.height = height+'px'
+        tempL.textContent = (dataReceived11.t).toFixed(2) + "°C"
+        prL.textContent = (dataReceived11.s).toFixed(2)+" кгс/см3"
+    }
+    if(dataReceived12){
+        var parL = document.getElementById("parL")
+        var parTotal = document.getElementById("parTotal")
+        parL.textContent = dataReceived12.perHour + " т/ч"
+        parTotal.textContent = (dataReceived12.total).toFixed(2)+" т"
+    }
+    if(dataReceived13){
+        var tempL = document.getElementById("tempL2")
+        var prL = document.getElementById("prL2")       
+        height2 = (dataReceived13.t * 245)/dataReceived13.g
+        progressBar2.style.height = height2+'px'
+        tempL.textContent = (dataReceived13.t).toFixed(2) + "°C"
+        prL.textContent = (dataReceived13.s).toFixed(2)+" кгс/см3"
+    }
+    if(dataReceived14){
+        var parL = document.getElementById("parL2")
+        var parTotal = document.getElementById("parTotal2")
+        parL.textContent = dataReceived14.perHour + " т/ч"
+        parTotal.textContent = (dataReceived14.total).toFixed(2)+" т"
+    }
+    if(dataReceived15){
+        var tempL = document.getElementById("tempL3")
+        var prL = document.getElementById("prL3")       
+        height3 = (dataReceived15.t * 245)/dataReceived15.g
+        progressBar3.style.height = height3+'px'
+        tempL.textContent = (dataReceived15.t).toFixed(2) + "°C"
+        prL.textContent = (dataReceived15.s).toFixed(2)+" кгс/см3"
+    }
+    if(dataReceived16){
+        var parL = document.getElementById("parL3")
+        var parTotal = document.getElementById("parTotal3")
+        parL.textContent = dataReceived16.perHour + " т/ч"
+        parTotal.textContent = (dataReceived16.total).toFixed(2)+" т"
     }
     if(dataReceived2){
         if(dataReceived2.image === 1){
@@ -137,51 +333,243 @@
         }
     }
 }
-    }, 1000);
+    for(var i =0; i<4; i++){
+        if(dataReceived17[i]){
+            if(dataReceived17[i].image===1){
+                if(variables[i]===0){
+                    var newImg = document.createElement('img');
+                    newImg.src = "{% static 'GlIU.gif' %}";
+                    newImg.alt = 'Ogon'; 
+                    newImg.id = 'f'+(i+1); 
+                    document.body.appendChild(newImg);
+                    variables[i]=1
+                }
+            } else {
+                if(document.getElementById('f'+(i+1))){
+                    var element = document.getElementById('f'+(i+1));
+                element.remove();
+                }
+                
+            }
+        }
+        if(dataReceived18[i]){
+            if(dataReceived18[i].image===1){
+                if(variables2[i]===0){
+                    var newImg = document.createElement('img');
+                    newImg.src = "{% static 'GlIU.gif' %}";
+                    newImg.alt = 'Ogon'; 
+                    newImg.id = 'f2'+(i+1); 
+                    document.body.appendChild(newImg);
+                    variables2[i]=1
+                }
+            } else {
+                if(document.getElementById('f2'+(i+1))){
+                    var element = document.getElementById('f2'+(i+1));
+                    element.remove();
+                }
+            }
+        }
+        if(dataReceived19[i]){
+            if(dataReceived19[i].image===1){
+                if(variables3[i]===0){
+                    var newImg = document.createElement('img');
+                    newImg.src = "{% static 'GlIU.gif' %}";
+                    newImg.alt = 'Ogon'; 
+                    newImg.id = 'f3'+(i+1); 
+                    document.body.appendChild(newImg);
+                    variables3[i]=1
+                }
+            } else {
+                if(document.getElementById('f3'+(i+1))){
+                    var element = document.getElementById('f3'+(i+1));
+                    element.remove();
+                }
+            }
+        }
+    }    
+    if(dataReceived20){
+        if(dataReceived20.z === 1){
+            var Zadvizhka = document.getElementById("z1")
+            Zadvizhka.src = "{% static 'z_active.png' %}"
+            changeSegmentColor(20, "deeppink");
+            changeSegmentColor(23, "deeppink");
+            changeSegmentColor(26, "deeppink");
+            changeSegmentColor(27, "deeppink");
+            changeSegmentColor(28, "deeppink");
+            changeSegmentColor(29, "deeppink");
+            z1=1
+        } else {
+            var Zadvizhka = document.getElementById("z1")
+            Zadvizhka.src = "{% static 'z_inactive.png' %}"
+            z1=0
+            changeSegmentColor(20, "grey");
+            changeSegmentColor(23, "grey");
+            if(z2===0 && z3===0
+            ){
+                changeSegmentColor(26, "grey");
+                changeSegmentColor(27, "grey");
+                changeSegmentColor(28, "grey");
+                changeSegmentColor(29, "grey");
+            }
+        }
+    }
+    if(dataReceived21){
+        if(dataReceived21.z === 1){
+            var Zadvizhka = document.getElementById("z2")
+            Zadvizhka.src = "{% static 'z_active.png' %}"
+            changeSegmentColor(21, "deeppink");
+            changeSegmentColor(24, "deeppink");
+            changeSegmentColor(26, "deeppink");
+            changeSegmentColor(27, "deeppink");
+            changeSegmentColor(28, "deeppink");
+            changeSegmentColor(29, "deeppink");
+            z2=1
+        } else {
+            var Zadvizhka = document.getElementById("z2")
+            Zadvizhka.src = "{% static 'z_inactive.png' %}"
+            changeSegmentColor(21, "grey");
+            changeSegmentColor(24, "grey");
+            z2=0
+            if(z1===0 && z3===0){
+                changeSegmentColor(26, "grey");
+                changeSegmentColor(27, "grey");
+                changeSegmentColor(28, "grey");
+                changeSegmentColor(29, "grey");
+            }
+        }
+    }
+    if(dataReceived22){
+        if(dataReceived22.z === 1){
+            var Zadvizhka = document.getElementById("z3")
+            Zadvizhka.src = "{% static 'z_active.png' %}"
+            changeSegmentColor(22, "deeppink");
+            changeSegmentColor(25, "deeppink");
+            changeSegmentColor(26, "deeppink");
+            changeSegmentColor(27, "deeppink");
+            changeSegmentColor(28, "deeppink");
+            changeSegmentColor(29, "deeppink");
+            z3=1
+        } else {
+            var Zadvizhka = document.getElementById("z3")
+            Zadvizhka.src = "{% static 'z_inactive.png' %}"
+            changeSegmentColor(22, "grey");
+            changeSegmentColor(25, "grey");
+            z3=0
+            if(z1===0 && z2===0){
+                changeSegmentColor(26, "grey");
+                changeSegmentColor(27, "grey");
+                changeSegmentColor(28, "grey");
+                changeSegmentColor(29, "grey");
+            }
+        }
+    }
+    if(dataReceived23){
+        if(dataReceived23.image === 1){
+            var img = document.getElementById("k1")
+            img.src = "{% static 'klapan_active.png' %}"
+        } else {
+            var img = document.getElementById("k1")
+            img.src = "{% static 'klapan_inactive.png' %}"
+        }
+    }
+    if(dataReceived24){
+        if(dataReceived24.image === 1){
+            var img = document.getElementById("k2")
+            img.src = "{% static 'klapan_active.png' %}"
+        } else {
+            var img = document.getElementById("k2")
+            img.src = "{% static 'klapan_inactive.png' %}"
+        }
+    }
+    if(dataReceived25){
+        var par1 = document.getElementById("par1")
+        var mw1 = document.getElementById("mw1")
+        var kwh1 = document.getElementById("kwh1")
+        par1.textContent=(dataReceived25.par).toFixed(2) + " т/ч"
+        mw1.textContent=(dataReceived25.energy).toFixed(2) + "МВт"
+        kwh1.textContent=(dataReceived25.total).toFixed(2) + "кВт*ч"
+        if(dataReceived25.image === 1){
+            var img = document.getElementById("turbine1")
+            img.src = "{% static 'turbineon.gif' %}"
+        } else {
+            var img = document.getElementById("turbine1")
+            img.src = "{% static 'turbineoff.jpeg' %}"
+        }
+    }
+    if(dataReceived26){
+        var par1 = document.getElementById("par2")
+        var mw1 = document.getElementById("mw2")
+        var kwh1 = document.getElementById("kwh2")
+        par1.textContent=(dataReceived26.par).toFixed(2)+ " т/ч"
+        mw1.textContent=(dataReceived26.energy).toFixed(2) + "МВт"
+        kwh1.textContent=(dataReceived26.total).toFixed(2) + "кВт*ч"
+        if(dataReceived26.image === 1){
+            var img = document.getElementById("turbine2")
+            img.src = "{% static 'turbineon.gif' %}"
+        } else {
+            var img = document.getElementById("turbine2")
+            img.src = "{% static 'turbineoff.jpeg' %}"
+        }
+    }
+}, 1000);
     document.addEventListener('DOMContentLoaded', function() {
         const startButton = document.getElementById('startButton');
-        
-
-    
-
-
-
+        canvas = document.getElementById("canvas");
+        ctx = canvas.getContext("2d");
+        canvas.width = 1920;
+        canvas.height = 1080;
+        ctx.lineWidth = 4;
+        drawLineSegments();
+        var progressBar = document.getElementById('tempBar1');
+        progressBar.style.height = 0
+      
 });
 
   </script>
 </head>
 <body>
-<div class= "big-container">
-    <div class="container5">
-        <img src="{% static 'convey1.gif' %}" alt="GIF Image" class="gif-image" id="image">
-        <label class="label" id = "ugolL">0.0000</label>
+    <canvas id="canvas"></canvas>
+    <img src="{% static 'convey1.gif' %}" id="image">
+    <label class="label" id = "ugolL">0.0000</label>
+    <img src="{% static 'mazut1.png' %}" id="mazut-image">
+    <label class="label_mazut" id = "mazutL">0.0000</label>
+    <img src="{% static 'kotel.png' %}" id="kotel_image">
+    <img src="{% static 'kotel.png' %}" id="kotel_image2">
+    <img src="{% static 'kotel.png' %}" id="kotel_image3">
+    <label id="tempL">0°C</label>
+    <label id="prL">0 кгс/см3</label>
+    <label id="parL">0 т/ч</label>
+    <label id="parTotal">0 т</label>
+    <label id="tempL2">0°C</label>
+    <label id="prL2">0 кгс/см3</label>
+    <label id="parL2">0 т/ч</label>
+    <label id="parTotal2">0 т</label>
+    <label id="tempL3">0°C</label>
+    <label id="prL3">0 кгс/см3</label>
+    <label id="parL3">0 т/ч</label>
+    <label id="parTotal3">0 т</label>
+    <div id="bar1">
+        <div id="tempBar1"></div>
     </div>
-    <div class="container6">
-        <img src="{% static 'mazut1.png' %}" alt="Image" class="mazut-image" id="mazut-image">
-        <label class="label_mazut" id = "mazutL">0.0000</label>
+    <div id="bar2">
+        <div id="tempBar2"></div>
     </div>
-</div>
-<div class="kotel-container">
-    <div id="container7">
-        <img src="{% static 'kotel.png' %}" class="kotel_image">
+    <div id="bar3">
+        <div id="tempBar3"></div>
     </div>
-    <div class="bar">
-        <div class="fill" id="tempBar"></div>
-    </div>
-    <div id="container8">
-        <img src="{% static 'kotel.png' %}" class="kotel_image2">
-    </div>
-    <div id="container9">
-        <img src="{% static 'kotel.png' %}" class="kotel_image3">
-        <img src="{% static 'GlIU.gif' %}" alt="GIF Image" class="f1" id="f31">
-        <img src="{% static 'GlIU.gif' %}" alt="GIF Image" class="f2" id="f32">
-        <img src="{% static 'GlIU.gif' %}" alt="GIF Image" class="f3" id="f33">
-        <img src="{% static 'GlIU.gif' %}" alt="GIF Image" class="f4" id="f34">
-    </div>
-</div>
-<div class="tub-container">
-    <img src="{% static 'turbineoff.jpeg' %}" class="turbine1" id="turbine1">
-    <img src="{% static 'turbineoff.jpeg' %}" class="turbine2" id="turbine2">
-</div>
+    <img src="{% static 'z_inactive.png' %}" id="z1">
+    <img src="{% static 'z_inactive.png' %}" id="z2">
+    <img src="{% static 'z_inactive.png' %}" id="z3">
+    <img src="{% static 'klapan_inactive.png' %}" id="k1">
+    <img src="{% static 'klapan_inactive.png' %}" id="k2">
+    <img src="{% static 'turbineoff.jpeg' %}" id="turbine1">
+    <label id="par1">0 т/ч</label>
+    <label id="mw1">0 МВт</label>
+    <label id="kwh1">0 кВт*ч</label>
+    <label id="par2">0 т/ч</label>
+    <label id="mw2">0 МВт</label>
+    <label id="kwh2">0 кВт*ч</label>
+    <img src="{% static 'turbineoff.jpeg' %}" id="turbine2">
+
 </body>
 </html>

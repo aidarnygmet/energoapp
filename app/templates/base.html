@@ -10,6 +10,7 @@
     for(var i=0; i<12; i++){
       interval[i] = null;
     }
+    let timerInterval;
     var runningTotal = 0;
     var mazutTotal = 0;
     var kotel1Total = 0;
@@ -18,6 +19,9 @@
     var eTotal = 0;
     var e2Total = 0;
     var activeFakels = 0;
+    var activeGorelkas = 0;
+    var activeGorelkas2 = 0;
+    var activeGorelkas3 = 0;
     var activeFakels2 = 0;
     var activeFakels3 = 0;
     var temp = 25;
@@ -349,39 +353,33 @@
       var goal_temp = document.getElementById("goal_temp")
       var goal_time = document.getElementById("goal_time")
       var tempL = document.getElementById("temp")
-      var fakel = []
-        fakel[0] = document.getElementById("f1");
-        fakel[1] = document.getElementById("f2");
-        fakel[2] = document.getElementById("f3");
-        fakel[3] = document.getElementById("f4");
+      
       if (interval[2]) {
-        var anime = { dur: parseInt(goal_time.value), pressed:1 };
-        localStorage.setItem('anime', JSON.stringify(anime));
-        console.log(anime)
+        var image = { image: 0 };
+        localStorage.setItem('kotel1', JSON.stringify(image));
+        var image2 = { image: 0 };
+        localStorage.setItem('ugol1', JSON.stringify(image2));
         var z = document.getElementById("z1")
         z.style.backgroundColor = "red"
         updateKotelStatus(objectId, 1, currentStatus)
         currentStatus = 0;
+        turnoffbuttons();
         sendKotelStatus(1, currentStatus);
         clearInterval(interval[2]);
         clearInterval(interval[8]);
         interval[8] = null;
         interval[2] = null;
         startButton.textContent = "Start"; 
-        fakel[0].style.backgroundColor = "red";
-        fakel[1].style.backgroundColor = "red";
-        fakel[2].style.backgroundColor = "red";
-        fakel[3].style.backgroundColor = "red";
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazutInput.value)
-        mazut_con.value="0.00"
         mazutInput.value = (currentValue_total_con - currentValue_con).toFixed(2); 
         var currentValue = parseFloat(ugol_con.value)
         var currentValue_total = parseFloat(ugolInput.value)
-        ugol_con.value = "0.00"
         ugolInput.value = (currentValue_total - currentValue).toFixed(2); 
         var currentVal = parseFloat(tonsPerHourInput.value);
         totalPar -= currentVal
+        var z = { z: 0};
+        localStorage.setItem('z1', JSON.stringify(z));
         adjustTurbines();
         tonsPerHourInput.value = "0.00"
         if(!interval[2] && !interval[3] && !interval[4]){
@@ -395,15 +393,25 @@
           clearInterval(interval[7])
           interval[7] = null;
         }
-        interval[8] = setInterval(cooldownTemp, 1000);
+        setTimeout(function(){
+          interval[8] = setInterval(cooldownTemp, 1000);
+        }, parseFloat(goal_time.value)*1000)
         
-      } else {
+        
+      } else {  
+        if(!timerInterval){
+          startTimer()  
+        }
+        var image = { image: 1 };
+        localStorage.setItem('kotel1', JSON.stringify(image));
+        var image2 = { image: 1 };
+        localStorage.setItem('ugol1', JSON.stringify(image2));
         
         if(ugol_con.value === '' || ugol_con.value == "0.00"){
-          ugol_con.value = '17.00'
+          ugol_con.value = '0.00'
         }
         if(mazut_con.value === '' || mazut_con.value == "0.00"){
-          mazut_con.value = '7.00'
+          mazut_con.value = '0.00'
         }
         if(ugolInput.value ===''){
             ugolInput.value = '0.00';
@@ -426,18 +434,8 @@
         var mazut_con_val = parseFloat(mazut_con.value);
         mazutInput.value = (currentValue_maz + mazut_con_val).toFixed(2);
         
-        fakel[0].style.backgroundColor = "green";
-        fakel[1].style.backgroundColor = "green";
-        fakel[2].style.backgroundColor = "green";
-        fakel[3].style.backgroundColor = "green";
-        var image = { image: 1 };
-        localStorage.setItem('f11', JSON.stringify(image));
-        localStorage.setItem('f12', JSON.stringify(image));
-        localStorage.setItem('f13', JSON.stringify(image));
-        localStorage.setItem('f14', JSON.stringify(image));
-        var anime = { dur: parseInt(goal_time.value), pressed:0 };
-        localStorage.setItem('anime', JSON.stringify(anime));
-        activeFakels = 4;
+        
+
         tonsPerHourInput.disabled = true;
         ugol_con.disabled = true;
         mazut_con.disabled = true;
@@ -448,8 +446,26 @@
           var tonsPerHour = parseFloat(tonsPerHourInput.value);
           kotel1Total += tonsPerHour/3600; 
           tonsTotalLabel.textContent = kotel1Total.toFixed(4);
+          var image = { perHour: tonsPerHour, total:kotel1Total };
+          localStorage.setItem('par', JSON.stringify(image));
         }, 1000);
         startButton.textContent = "Stop"; 
+        setTimeout(function() {
+          handleF1Click();
+          handleG1Click();
+          setTimeout(function() {
+            handleF2Click();
+            handleG2Click();
+            setTimeout(function() {
+              handleF3Click();
+              handleG3Click();
+              setTimeout(function() {
+                handleF4Click();
+                handleG4Click();
+              }, parseFloat(goal_time.value)*7500);
+            }, parseFloat(goal_time.value)*7500);
+          }, parseFloat(goal_time.value)*7500);
+        }, 0);
         clearInterval(interval[8]);
         interval[8] = setInterval(updateTemp, 1000);
         if(firsttime != 0){
@@ -485,9 +501,14 @@
         fakel[3] = document.getElementById("f24");
       if (interval[3]) {
         var z = document.getElementById("z2")
+        var image = { image: 0 };
+        localStorage.setItem('kotel2', JSON.stringify(image));
+        var image2 = { image: 0 };
+        localStorage.setItem('ugol2', JSON.stringify(image2));
         z.style.backgroundColor = "red"
         updateKotelStatus(objectId2, 2, currentStatus2)
         currentStatus2 = 0;
+        turnoffbuttons2();
         sendKotelStatus(2, currentStatus2);
         clearInterval(interval[3]);
         interval[3] = null;
@@ -497,20 +518,16 @@
         tonsPerHourInput.disabled = false;
         ugol_con.disabled = false;
         mazut_con.disabled = false;
-        fakel[0].style.backgroundColor = "red";
-        fakel[1].style.backgroundColor = "red";
-        fakel[2].style.backgroundColor = "red";
-        fakel[3].style.backgroundColor = "red";
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazutInput.value)
-        mazut_con.value="0.00"
         mazutInput.value = (currentValue_total_con - currentValue_con).toFixed(2); 
         var currentValue = parseFloat(ugol_con.value)
         var currentValue_total = parseFloat(ugolInput.value)
-        ugol_con.value = "0.00"
         ugolInput.value = (currentValue_total - currentValue).toFixed(2); 
         var currentVal = parseFloat(tonsPerHourInput.value);
         totalPar -= currentVal
+        var z = { z: 0};
+        localStorage.setItem('z2', JSON.stringify(z));
         adjustTurbines();
         tonsPerHourInput.value = "0.00"
         if(!interval[2] && !interval[3] && !interval[4]){
@@ -524,13 +541,23 @@
           clearInterval(interval[7])
           interval[7] = null;
         }
-        interval[9] = setInterval(cooldownTemp2, 1000);
+        setTimeout(function(){
+          interval[9] = setInterval(cooldownTemp2, 1000);
+        }, parseFloat(goal_time.value)*1000)
+        
       } else {
+        if(!timerInterval){
+          startTimer()  
+        }
+        var image = { image: 1 };
+        localStorage.setItem('kotel2', JSON.stringify(image));
+        var image2 = { image: 1 };
+        localStorage.setItem('ugol2', JSON.stringify(image2));
         if(ugol_con.value === '' || ugol_con.value == "0.00"){
-          ugol_con.value = '17.00'
+          ugol_con.value = '0.00'
         }
         if(mazut_con.value === '' || mazut_con.value == "0.00"){
-          mazut_con.value = '7.00'
+          mazut_con.value = '0.00'
         }
         if(ugolInput.value ===''){
             ugolInput.value = '0.00';
@@ -557,11 +584,22 @@
         var mazut_con_val = parseFloat(mazut_con.value);
         mazutInput.value = (currentValue_maz + mazut_con_val).toFixed(2);
         
-        fakel[0].style.backgroundColor = "green";
-        fakel[1].style.backgroundColor = "green";
-        fakel[2].style.backgroundColor = "green";
-        fakel[3].style.backgroundColor = "green";
-        activeFakels2 = 4;
+        setTimeout(function() {
+          handleF1Click2();
+          handleG1Click2();
+          setTimeout(function() {
+            handleF2Click2();
+            handleG2Click2();
+            setTimeout(function() {
+              handleF3Click2();
+              handleG3Click2();
+              setTimeout(function() {
+                handleF4Click2();
+                handleG4Click2();
+              }, parseFloat(goal_time.value)*7500);
+            }, parseFloat(goal_time.value)*7500);
+          }, parseFloat(goal_time.value)*7500);
+        }, 0);
         tonsPerHourInput.disabled = true;
         ugol_con.disabled = true;
         mazut_con.disabled = true;
@@ -572,6 +610,8 @@
           var tonsPerHour = parseFloat(tonsPerHourInput.value);
           kotel2Total += tonsPerHour/3600; 
           tonsTotalLabel.textContent = kotel2Total.toFixed(4);
+          var image = { perHour: tonsPerHour, total:kotel2Total };
+          localStorage.setItem('par2', JSON.stringify(image));
         }, 1000);
         startButton.textContent = "Stop"; 
         if(firsttime2 != 0){
@@ -603,7 +643,14 @@
       if (interval[4]) {
         var z = document.getElementById("z3")
         z.style.backgroundColor = "red"
-        
+        var image = { image: 0 };
+        localStorage.setItem('kotel3', JSON.stringify(image));
+        var image2 = { image: 0 };
+        localStorage.setItem('ugol3', JSON.stringify(image2));
+        setTimeout(function(){
+          interval[10] = setInterval(cooldownTemp3, 1000);
+        }, parseFloat(goal_time.value)*1000)
+        turnoffbuttons3();
         updateKotelStatus(objectId3, 3, currentStatus3)
         currentStatus3 = 0;
         sendKotelStatus(3, currentStatus3);
@@ -615,21 +662,17 @@
         tonsPerHourInput.disabled = false;
         ugol_con.disabled = false;
         mazut_con.disabled = false;
-        fakel[0].style.backgroundColor = "red";
-        fakel[1].style.backgroundColor = "red";
-        fakel[2].style.backgroundColor = "red";
-        fakel[3].style.backgroundColor = "red";
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazutInput.value)
-        mazut_con.value="0.00"
         mazutInput.value = (currentValue_total_con - currentValue_con).toFixed(2); 
         var currentValue = parseFloat(ugol_con.value)
         var currentValue_total = parseFloat(ugolInput.value)
-        ugol_con.value = "0.00"
         ugolInput.value = (currentValue_total - currentValue).toFixed(2); 
         var currentVal = parseFloat(tonsPerHourInput.value);
         totalPar -= currentVal
         adjustTurbines();
+        var z = { z: 0};
+        localStorage.setItem('z3', JSON.stringify(z));
         tonsPerHourInput.value = "0.00"
         if(!interval[2] && !interval[3] && !interval[4]){
           image = { image: 0 };
@@ -642,13 +685,19 @@
           clearInterval(interval[7])
           interval[7] = null;
         }
-        interval[10] = setInterval(cooldownTemp3, 1000);
       } else {
+        if(!timerInterval){
+          startTimer()  
+        }
+        var image = { image: 1 };
+        localStorage.setItem('kotel3', JSON.stringify(image));
+        var image2 = { image: 1 };
+        localStorage.setItem('ugol3', JSON.stringify(image2));
         if(ugol_con.value === '' || ugol_con.value == "0.00"){
-          ugol_con.value = '17.00'
+          ugol_con.value = '0.00'
         }
         if(mazut_con.value === '' || mazut_con.value == "0.00"){
-          mazut_con.value = '7.00'
+          mazut_con.value = '0.00'
         }
         if(ugolInput.value ===''){
             ugolInput.value = '0.00';
@@ -662,6 +711,22 @@
         if(goal_temp.value === ''){
             goal_temp.value = '540'
         }
+        setTimeout(function() {
+          handleF1Click3();
+          handleG1Click3();
+          setTimeout(function() {
+            handleF2Click3();
+            handleG2Click3();
+            setTimeout(function() {
+              handleF3Click3();
+              handleG3Click3();
+              setTimeout(function() {
+                handleF4Click3();
+                handleG4Click3();
+              }, parseFloat(goal_time.value)*7500);
+            }, parseFloat(goal_time.value)*7500);
+          }, parseFloat(goal_time.value)*7500);
+        }, 0);
         var currentValue = parseFloat(ugolInput.value);
         var ugol_con_val = parseFloat(ugol_con.value);
         ugolInput.value = (currentValue + ugol_con_val).toFixed(2);
@@ -674,12 +739,6 @@
         var currentValue_maz = parseFloat(mazutInput.value);
         var mazut_con_val = parseFloat(mazut_con.value);
         mazutInput.value = (currentValue_maz + mazut_con_val).toFixed(2);
-        
-        fakel[0].style.backgroundColor = "green";
-        fakel[1].style.backgroundColor = "green";
-        fakel[2].style.backgroundColor = "green";
-        fakel[3].style.backgroundColor = "green";
-        activeFakels3 = 4;
         tonsPerHourInput.disabled = true;
         ugol_con.disabled = true;
         mazut_con.disabled = true;
@@ -690,6 +749,8 @@
           var tonsPerHour = parseFloat(tonsPerHourInput.value);
           kotel3Total += tonsPerHour/3600; 
           tonsTotalLabel.textContent = kotel3Total.toFixed(4);
+          var image = { perHour: tonsPerHour, total:kotel3Total };
+          localStorage.setItem('par3', JSON.stringify(image));
         }, 1000);
         startButton.textContent = "Stop"; 
         if(firsttime3 != 0){
@@ -703,6 +764,114 @@
         
       }
     }
+    function turnoffbuttons(){
+      var fakels = []
+        fakels[0] = document.getElementById("f1");
+        fakels[1] = document.getElementById("f2");
+        fakels[2] = document.getElementById("f3");
+        fakels[3] = document.getElementById("f4");
+      var gorelkas = []
+        gorelkas[0] = document.getElementById("uf1");
+        gorelkas[1] = document.getElementById("uf2");
+        gorelkas[2] = document.getElementById("uf3");
+        gorelkas[3] = document.getElementById("uf4");
+      if(fakels[0].style.backgroundColor==="green"){
+          handleF1Click();
+      }
+      if(fakels[1].style.backgroundColor==="green"){
+          handleF2Click();
+      }
+      if(fakels[2].style.backgroundColor==="green"){
+          handleF3Click();
+      }
+      if(fakels[3].style.backgroundColor==="green"){
+          handleF4Click();
+      }
+      if(gorelkas[0].style.backgroundColor==="green"){
+          handleG1Click();
+      }
+      if(gorelkas[1].style.backgroundColor==="green"){
+          handleG2Click();
+      }
+      if(gorelkas[2].style.backgroundColor==="green"){
+          handleG3Click();
+      }
+      if(gorelkas[3].style.backgroundColor==="green"){
+          handleG4Click();
+      }
+    }
+    function turnoffbuttons2(){
+      var fakels = []
+        fakels[0] = document.getElementById("f21");
+        fakels[1] = document.getElementById("f22");
+        fakels[2] = document.getElementById("f23");
+        fakels[3] = document.getElementById("f24");
+      var gorelkas = []
+        gorelkas[0] = document.getElementById("uf21");
+        gorelkas[1] = document.getElementById("uf22");
+        gorelkas[2] = document.getElementById("uf23");
+        gorelkas[3] = document.getElementById("uf24");
+      if(fakels[0].style.backgroundColor==="green"){
+          handleF1Click2();
+      }
+      if(fakels[1].style.backgroundColor==="green"){
+          handleF2Click2();
+      }
+      if(fakels[2].style.backgroundColor==="green"){
+          handleF3Click2();
+      }
+      if(fakels[3].style.backgroundColor==="green"){
+          handleF4Click2();
+      }
+      if(gorelkas[0].style.backgroundColor==="green"){
+          handleG1Click2();
+      }
+      if(gorelkas[1].style.backgroundColor==="green"){
+          handleG2Click2();
+      }
+      if(gorelkas[2].style.backgroundColor==="green"){
+          handleG3Click2();
+      }
+      if(gorelkas[3].style.backgroundColor==="green"){
+          handleG4Click2();
+      }
+    }
+    function turnoffbuttons3(){
+      var fakels = []
+        fakels[0] = document.getElementById("f31");
+        fakels[1] = document.getElementById("f32");
+        fakels[2] = document.getElementById("f33");
+        fakels[3] = document.getElementById("f34");
+      var gorelkas = []
+        gorelkas[0] = document.getElementById("uf31");
+        gorelkas[1] = document.getElementById("uf32");
+        gorelkas[2] = document.getElementById("uf33");
+        gorelkas[3] = document.getElementById("uf34");
+      if(fakels[0].style.backgroundColor==="green"){
+          handleF1Click3();
+      }
+      if(fakels[1].style.backgroundColor==="green"){
+          handleF2Click3();
+      }
+      if(fakels[2].style.backgroundColor==="green"){
+          handleF3Click3();
+      }
+      if(fakels[3].style.backgroundColor==="green"){
+          handleF4Click3();
+      }
+      if(gorelkas[0].style.backgroundColor==="green"){
+          handleG1Click3();
+      }
+      if(gorelkas[1].style.backgroundColor==="green"){
+          handleG2Click3();
+      }
+      if(gorelkas[2].style.backgroundColor==="green"){
+          handleG3Click3();
+      }
+      if(gorelkas[3].style.backgroundColor==="green"){
+          handleG4Click3();
+      }
+    }
     function updateTemp(){
       var tempL = document.getElementById("temp")
       var time = document.getElementById("goal_time")
@@ -713,8 +882,11 @@
       var goal_temp = parseFloat(goal_temp_L.value)
       pr_val = pr_val +(100)/ (parseFloat(time.value) * 60)
       temp = temp +(goal_temp-25)/ (parseFloat(time.value) * 60)
-      
-      if(temp > goal_temp){
+      pr.textContent = pr_val.toFixed(2)
+      tempL.textContent = (temp).toFixed(2)
+      var image = { t: temp , g: goal_temp, s: pr_val};
+      localStorage.setItem('bar1', JSON.stringify(image));
+      if(temp +(goal_temp-25)/ (parseFloat(time.value) * 60) > goal_temp){
         clearInterval(interval[8]);
         handleF1Click();
         handleF2Click();
@@ -725,13 +897,14 @@
         sendKotelStatus(1, currentStatus);
         par.value = (160).toFixed(2)
         totalPar +=160;
+        var zad = { z: 1};
+        localStorage.setItem('z1', JSON.stringify(zad));
         z.style.backgroundColor = "green"
         adjustTurbines();
         
         return;
       }
-      pr.textContent = pr_val.toFixed(2)
-      tempL.textContent = (temp).toFixed(2)
+      
       
     }
     function adjustTurbines(){
@@ -796,7 +969,11 @@
       var goal_temp = parseFloat(goal_temp_L.value)
       pr_val2 = pr_val2 +(100)/ (parseFloat(time.value) * 60)
       temp2 = temp2 +(goal_temp-25)/ (parseFloat(time.value) * 60)
-      if(temp2 > goal_temp){
+      var image = { t: temp2 , g: goal_temp, s: pr_val2};
+      localStorage.setItem('bar2', JSON.stringify(image));
+      pr.textContent = pr_val2.toFixed(2)
+      tempL.textContent = (temp2).toFixed(2)
+      if(temp2 +(goal_temp-25)/ (parseFloat(time.value) * 60) > goal_temp){
         clearInterval(interval[9]);
         handleF1Click2();
         handleF2Click2();
@@ -809,10 +986,11 @@
         z.style.backgroundColor = "green"
         totalPar +=160;
         adjustTurbines();
+        var z = { z: 1};
+        localStorage.setItem('z2', JSON.stringify(z));
         return;
       }
-      pr.textContent = pr_val2.toFixed(2)
-      tempL.textContent = (temp2).toFixed(2)
+      
     }
     function updateTemp3(){
       var tempL = document.getElementById("temp3")
@@ -824,7 +1002,11 @@
       var z = document.getElementById("z3")
       pr_val3 = pr_val3 +(100)/ (parseFloat(time.value) * 60)
       temp3 = temp3 +(goal_temp-25)/ (parseFloat(time.value) * 60)
-      if(temp3 > goal_temp){
+      var image = { t: temp3 , g: goal_temp, s: pr_val3};
+      localStorage.setItem('bar3', JSON.stringify(image));
+      pr.textContent = pr_val3.toFixed(2)
+      tempL.textContent = (temp3).toFixed(2)
+      if(temp3 +(goal_temp-25)/ (parseFloat(time.value) * 60) > goal_temp){
         clearInterval(interval[10]);
         handleF1Click3();
         handleF2Click3();
@@ -836,11 +1018,12 @@
         sendKotelStatus(3, currentStatus3);
         z.style.backgroundColor = "green"
         totalPar +=160;
+        var z = { z: 1};
+        localStorage.setItem('z3', JSON.stringify(z));
         adjustTurbines();
         return;
       }
-      pr.textContent = pr_val3.toFixed(2)
-      tempL.textContent = (temp3).toFixed(2)
+      
     }
     function cooldownTemp(){
       var tempL = document.getElementById("temp")
@@ -848,17 +1031,20 @@
       var pr = document.getElementById("pr")
       var goal_temp_L = document.getElementById("goal_temp")
       var goal_temp = parseFloat(goal_temp_L.value)
-      pr_val = pr_val -(100)/ (parseFloat(time.value) * 60)
-      temp = temp -(goal_temp-25)/ (parseFloat(time.value) * 60)
+      pr_val = pr_val -(100)/ (parseFloat(time.value) * 360)
+      temp = temp -(goal_temp-25)/ (parseFloat(time.value) * 360)
+      pr.textContent = pr_val.toFixed(2)
+      tempL.textContent = (temp).toFixed(2)
+      var image = { t: temp , g: goal_temp, s:pr_val};
+      localStorage.setItem('bar1', JSON.stringify(image));
       if(pr_val<0){
         pr_val = 0
       }
-      if(temp < 25){
+      if(temp -(goal_temp-25)/ (parseFloat(time.value) * 360) < 25){
         clearInterval(interval[8]);
         return;
       }
-      pr.textContent = pr_val.toFixed(2)
-      tempL.textContent = (temp).toFixed(2)
+      
     }
     function cooldownTemp2(){
       var tempL = document.getElementById("temp2")
@@ -866,17 +1052,20 @@
       var pr = document.getElementById("pr2")
       var goal_temp_L = document.getElementById("goal_temp2")
       var goal_temp = parseFloat(goal_temp_L.value)
-      pr_val2 = pr_val2 -(100)/ (parseFloat(time.value) * 60)
-      temp2 = temp2 -(goal_temp-25)/ (parseFloat(time.value) * 60)
+      pr_val2 = pr_val2 -(100)/ (parseFloat(time.value) * 360)
+      temp2 = temp2 -(goal_temp-25)/ (parseFloat(time.value) * 360)
+      pr.textContent = pr_val2.toFixed(2)
+      tempL.textContent = (temp2).toFixed(2)
+      var image = { t: temp2 , g: goal_temp, s:pr_val2};
+      localStorage.setItem('bar2', JSON.stringify(image));
       if(pr_val2<0){
         pr_val2 = 0
       }
-      if(temp2 < 25){
+      if(temp2 -(goal_temp-25)/ (parseFloat(time.value) * 360) < 25){
         clearInterval(interval[9]);
         return;
       }
-      pr.textContent = pr_val2.toFixed(2)
-      tempL.textContent = (temp2).toFixed(2)
+      
     }
     function cooldownTemp3(){
       var tempL = document.getElementById("temp3")
@@ -884,17 +1073,20 @@
       var pr = document.getElementById("pr3")
       var goal_temp_L = document.getElementById("goal_temp3")
       var goal_temp = parseFloat(goal_temp_L.value)
-      pr_val3 = pr_val3 -(100)/ (parseFloat(time.value) * 60)
-      temp3 = temp3 -(goal_temp-25)/ (parseFloat(time.value) * 60)
+      pr_val3 = pr_val3 -(100)/ (parseFloat(time.value) * 360)
+      temp3 = temp3 -(goal_temp-25)/ (parseFloat(time.value) * 360)
+      var image = { t: temp3 , g: goal_temp, s:pr_val3};
+      localStorage.setItem('bar3', JSON.stringify(image));
+      pr.textContent = pr_val3.toFixed(2)
+      tempL.textContent = (temp3).toFixed(2)
       if(pr_val3<0){
         pr_val3 = 0
       }
-      if(temp3 < 25){
+      if(temp3 -(goal_temp-25)/ (parseFloat(time.value) * 360) < 25){
         clearInterval(interval[10]);
         return;
       }
-      pr.textContent = pr_val3.toFixed(2)
-      tempL.textContent = (temp3).toFixed(2)
+      
     }
     function handleTurClick() {
       var startButton = document.getElementById("start_t_button");
@@ -910,6 +1102,11 @@
         tonsPerHourInput.disabled = false;
         mwperhour.value = "0.00";
         activeTur-=1
+        var image = {image: 0}
+        var image2 = { image: 0, energy: parseFloat(mwperhour.value), par: parseFloat(tonsPerHourInput.value), total:parseFloat(tonsTotalLabel.textContent)};
+        console.log("here")
+        localStorage.setItem('tur1', JSON.stringify(image));
+        localStorage.setItem('energy1', JSON.stringify(image2));
         adjustTurbines();
       } else {
         tonsPerHourInput.disabled = true;
@@ -919,9 +1116,20 @@
           var tonsPerHour = parseFloat(mwperhour.value);
           eTotal += (tonsPerHour*1000)/3600; 
           tonsTotalLabel.textContent = eTotal.toFixed(4);
+          var parInput = parseFloat(tonsPerHourInput.value)
+          var totalEnergy = parseFloat(tonsTotalLabel.textContent)
+          if(tonsPerHour>0){
+            var image = { image: 1, energy: tonsPerHour, par: parInput, total: totalEnergy};
+            localStorage.setItem('energy1', JSON.stringify(image));
+          } else {
+            var image = { image: 0, energy: tonsPerHour, par: parseFloat(tonsPerHourInput.value), total:parseFloat(tonsTotalLabel.textContent)};
+            localStorage.setItem('energy1', JSON.stringify(image));
+          }
         }, 1000);
         activeTur+=1;
         startButton.textContent = "Stop"; 
+        var image = { image: 1};
+        localStorage.setItem('tur1', JSON.stringify(image));
         adjustTurbines();
       }
     }
@@ -938,6 +1146,10 @@
         startButton.textContent = "Start"; // Update button label
         tonsPerHourInput.disabled = false;
         activeTur-=1
+        var image = { image: 0};
+        var image2 = { image: 0, energy: parseFloat(mwperhour.value), par: parseFloat(tonsPerHourInput.value), total:parseFloat(tonsTotalLabel.textContent)};
+        localStorage.setItem('tur2', JSON.stringify(image));
+        localStorage.setItem('energy2', JSON.stringify(image));
         adjustTurbines();
       } else {
         
@@ -946,9 +1158,19 @@
           var tonsPerHour = parseFloat(mwperhour.value);
           e2Total += (tonsPerHour*1000)/3600; 
           tonsTotalLabel.textContent = e2Total.toFixed(4);
+          if(tonsPerHour>0){
+            var image = { image: 1, energy: tonsPerHour, par: parseFloat(tonsPerHourInput.value), total:parseFloat(tonsTotalLabel.textContent)};
+            localStorage.setItem('energy2', JSON.stringify(image));
+          } else {
+            var image = { image: 0, energy: tonsPerHour, par: parseFloat(tonsPerHourInput.value), total:parseFloat(tonsTotalLabel.textContent)};
+            localStorage.setItem('energy2', JSON.stringify(image));
+          }
+          
         }, 1000);
         activeTur+=1;
         startButton.textContent = "Stop"; 
+        var image = { image: 1};
+        localStorage.setItem('tur2', JSON.stringify(image));
         adjustTurbines();
       }
     }
@@ -1008,33 +1230,62 @@
     }
     function handleIncrease_mW_Click() {
       var tonsPerHourInput = document.getElementById("mW");
+      var energyPerHourInput = document.getElementById("actualMW");
       if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
-        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+        if(parseFloat(tonsPerHourInput.value)<240 && waste>0){
+          var currentValue = parseFloat(tonsPerHourInput.value)+1;
+          tonsPerHourInput.value = (currentValue).toFixed(2);
+          var energyInput=(currentValue/240)*75;
+          energyPerHourInput.value = (energyInput).toFixed(2);
+          waste--;
+          var wLabel = document.getElementById("extraParLabel");
+          wLabel.textContent = (waste).toFixed(2);
+        }
       }
     }
     function handleDecrease_mW_Click() {
       var tonsPerHourInput = document.getElementById("mW");
-
+      var energyPerHourInput = document.getElementById("actualMW");
       if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
-        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+        if(parseFloat(tonsPerHourInput.value)>0){
+          var currentValue = parseFloat(tonsPerHourInput.value)-1;
+          tonsPerHourInput.value = (currentValue).toFixed(2);
+          var energyInput=(currentValue/240)*75;
+          energyPerHourInput.value = (energyInput).toFixed(2);
+          waste++;
+          var wLabel = document.getElementById("extraParLabel");
+          wLabel.textContent = (waste).toFixed(2);
+        }
       }
-      
     }
     function handleIncrease_mW2_Click() {
       var tonsPerHourInput = document.getElementById("mW2");
+      var energyPerHourInput = document.getElementById("actualMW2");
       if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
-        tonsPerHourInput.value = (currentValue + 1).toFixed(2);
+        if(parseFloat(tonsPerHourInput.value)<240 && waste>0){
+          var currentValue = parseFloat(tonsPerHourInput.value)+1;
+          tonsPerHourInput.value = (currentValue).toFixed(2);
+          var energyInput=(currentValue/240)*75;
+          energyPerHourInput.value = (energyInput).toFixed(2);
+          waste--;
+          var wLabel = document.getElementById("extraParLabel");
+          wLabel.textContent = (waste).toFixed(2);
+        }
       }
     }
     function handleDecrease_mW2_Click() {
       var tonsPerHourInput = document.getElementById("mW2");
-
+      var energyPerHourInput = document.getElementById("actualMW2");
       if (tonsPerHourInput.disabled) {
-        var currentValue = parseFloat(tonsPerHourInput.value);
-        tonsPerHourInput.value = (currentValue - 1).toFixed(2);
+        if(parseFloat(tonsPerHourInput.value)>0){
+          var currentValue = parseFloat(tonsPerHourInput.value)-1;
+          tonsPerHourInput.value = (currentValue).toFixed(2);
+          var energyInput=(currentValue/240)*75;
+          energyPerHourInput.value = (energyInput).toFixed(2);
+          waste++;
+          var wLabel = document.getElementById("extraParLabel");
+          wLabel.textContent = (waste).toFixed(2);
+        }
       }
       
     }
@@ -1081,19 +1332,21 @@
       var mazut_con = document .getElementById("mazut_con");
       if(interval[2]){
         if(button.style.backgroundColor === "green"){
-        var image = { image: 0 };
-        localStorage.setItem('f11', JSON.stringify(image));
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
         mazut_con.value = (currentValue_con - 1/activeFakels * currentValue_con).toFixed(2)
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels = activeFakels-1
+        if(activeFakels === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel1', JSON.stringify(image));
+        }
       } else {
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
         var image = { image: 1 };
-        localStorage.setItem('f11', JSON.stringify(image));
+          localStorage.setItem('kotel1', JSON.stringify(image));
         if(activeFakels === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1112,19 +1365,21 @@
       var mazut_con = document .getElementById("mazut_con");
       if(interval[2]){
         if(button.style.backgroundColor === "green"){
-        var image = { image: 0 };
-        localStorage.setItem('f12', JSON.stringify(image));
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
         mazut_con.value = (currentValue_con - 1/activeFakels * currentValue_con).toFixed(2)
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels = activeFakels-1
+        if(activeFakels === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel1', JSON.stringify(image));
+        }
       } else {
-        var image = { image: 1 };
-        localStorage.setItem('f12', JSON.stringify(image));
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+          localStorage.setItem('kotel1', JSON.stringify(image));
         if(activeFakels === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1143,19 +1398,21 @@
       var mazut_con = document .getElementById("mazut_con");
       if(interval[2]){
         if(button.style.backgroundColor === "green"){
-        var image = { image: 0 };
-        localStorage.setItem('f13', JSON.stringify(image));
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
         mazut_con.value = (currentValue_con - 1/activeFakels * currentValue_con).toFixed(2)
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels = activeFakels-1
+        if(activeFakels === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel1', JSON.stringify(image));
+        }
       } else {
-        var image = { image: 1 };
-        localStorage.setItem('f13', JSON.stringify(image));
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+        localStorage.setItem('kotel1', JSON.stringify(image));
         if(activeFakels === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1174,19 +1431,21 @@
       var mazut_con = document .getElementById("mazut_con");
       if(interval[2]){
         if(button.style.backgroundColor === "green"){
-        var image = { image: 0 };
-        localStorage.setItem('f14', JSON.stringify(image));
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
         mazut_con.value = (currentValue_con - 1/activeFakels * currentValue_con).toFixed(2)
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels = activeFakels-1
+        if(activeFakels === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel1', JSON.stringify(image));
+        }
       } else {
-        var image = { image: 1 };
-        localStorage.setItem('f14', JSON.stringify(image));
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+        localStorage.setItem('kotel1', JSON.stringify(image));
         if(activeFakels === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1196,6 +1455,450 @@
         }
         button.style.backgroundColor = "green";
         activeFakels = activeFakels+1
+      }
+      }
+    }
+    function handleG1Click(){
+      var button = document.getElementById("uf1");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con");
+      if(interval[2]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas = activeGorelkas-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g1', JSON.stringify(image3));
+        if(activeGorelkas === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol1', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol1', JSON.stringify(image2));
+        if(activeGorelkas === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas * currentValue_con).toFixed(2)
+        }
+        var image3 = { image: 1 };
+        localStorage.setItem('g1', JSON.stringify(image3));
+        button.style.backgroundColor = "green";
+        activeGorelkas = activeGorelkas+1
+      }
+      }
+    }
+    function handleG2Click(){
+      var button = document.getElementById("uf2");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con");
+      if(interval[2]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas = activeGorelkas-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g2', JSON.stringify(image3));
+        if(activeGorelkas === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol1', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol1', JSON.stringify(image2));
+        if(activeGorelkas === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas = activeGorelkas+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g2', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG3Click(){
+      var button = document.getElementById("uf3");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con");
+      if(interval[2]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas = activeGorelkas-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g3', JSON.stringify(image3));
+        if(activeGorelkas === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol1', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol1', JSON.stringify(image2));
+        if(activeGorelkas === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas = activeGorelkas+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g3', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG4Click(){
+      var button = document.getElementById("uf4");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con");
+      if(interval[2]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas = activeGorelkas-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g4', JSON.stringify(image3));
+        if(activeGorelkas === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol1', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol1', JSON.stringify(image2));
+        if(activeGorelkas === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas = activeGorelkas+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g4', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG1Click2(){
+      var button = document.getElementById("uf21");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con2");
+      if(interval[3]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas2 = activeGorelkas2-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g21', JSON.stringify(image3));
+        if(activeGorelkas2 === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol2', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol2', JSON.stringify(image2));
+        if(activeGorelkas2 === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas2 * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas2 = activeGorelkas2+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g21', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG2Click2(){
+      var button = document.getElementById("uf22");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con2");
+      if(interval[3]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas2 = activeGorelkas2-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g22', JSON.stringify(image3));
+        if(activeGorelkas2 === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol2', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol2', JSON.stringify(image2));
+        if(activeGorelkas2 === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas2 * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas2 = activeGorelkas2+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g22', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG3Click2(){
+      var button = document.getElementById("uf23");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con2");
+      if(interval[3]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas2 = activeGorelkas2-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g23', JSON.stringify(image3));
+        if(activeGorelkas2 === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol2', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol2', JSON.stringify(image2));
+        if(activeGorelkas2 === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas2 * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas2 = activeGorelkas2+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g23', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG4Click2(){
+      var button = document.getElementById("uf24");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con2");
+      if(interval[3]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas2 = activeGorelkas2-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g24', JSON.stringify(image3));
+        if(activeGorelkas2 === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol2', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol2', JSON.stringify(image2));
+        if(activeGorelkas2 === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas2 * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas2 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas2 = activeGorelkas2+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g24', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG1Click3(){
+      var button = document.getElementById("uf31");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con3");
+      if(interval[4]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas3 = activeGorelkas3-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g31', JSON.stringify(image3));
+        if(activeGorelkas3 === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol3', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol3', JSON.stringify(image2));
+        if(activeGorelkas3 === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas3 * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas3 = activeGorelkas3+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g31', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG2Click3(){
+      var button = document.getElementById("uf32");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con3");
+      if(interval[4]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas3 = activeGorelkas3-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g32', JSON.stringify(image3));
+        if(activeGorelkas3 === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol3', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol3', JSON.stringify(image2));
+        if(activeGorelkas3 === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas3 * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas3 = activeGorelkas3+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g32', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG3Click3(){
+      var button = document.getElementById("uf33");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con3");
+      if(interval[4]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas3 = activeGorelkas3-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g33', JSON.stringify(image3));
+        if(activeGorelkas3 === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol3', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol3', JSON.stringify(image2));
+        if(activeGorelkas3 === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas3 * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas3 = activeGorelkas3+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g33', JSON.stringify(image3));
+      }
+      }
+    }
+    function handleG4Click3(){
+      var button = document.getElementById("uf34");
+      var ugol_con_total = document.getElementById("t_per_h");
+      var ugol_con = document .getElementById("ugol_con3");
+      if(interval[4]){
+        if(button.style.backgroundColor === "green"){
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        ugol_con.value = (currentValue_con - 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        ugol_con_total.value = (currentValue_total_con - 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        button.style.backgroundColor = "red";
+        activeGorelkas3 = activeGorelkas3-1
+        var image3 = { image: 0 };
+        localStorage.setItem('g34', JSON.stringify(image3));
+        if(activeGorelkas3 === 0){
+          var image2 = { image: 0 };
+          localStorage.setItem('ugol3', JSON.stringify(image2));
+        }
+      } else {
+        var currentValue_con = parseFloat(ugol_con.value)
+        var currentValue_total_con = parseFloat(ugol_con_total.value)
+        var image2 = { image: 1 };
+          localStorage.setItem('ugol3', JSON.stringify(image2));
+        if(activeGorelkas3 === 0){
+          ugol_con.value = (17/4).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 17/4).toFixed(2)
+        } else {
+          ugol_con.value = (currentValue_con + 1/activeGorelkas3 * currentValue_con).toFixed(2)
+          ugol_con_total.value = (currentValue_total_con + 1/activeGorelkas3 * currentValue_con).toFixed(2)
+        }
+        button.style.backgroundColor = "green";
+        activeGorelkas3 = activeGorelkas3+1
+        var image3 = { image: 1 };
+        localStorage.setItem('g34', JSON.stringify(image3));
       }
       }
     }
@@ -1248,9 +1951,15 @@
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels2 * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels2 = activeFakels2-1
+        if(activeFakels2 === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel2', JSON.stringify(image));
+        }
       } else {
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+          localStorage.setItem('kotel2', JSON.stringify(image));
         if(activeFakels2 === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1276,9 +1985,15 @@
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels2 * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels2 = activeFakels2-1
+        if(activeFakels2 === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel2', JSON.stringify(image));
+        }
       } else {
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+          localStorage.setItem('kotel2', JSON.stringify(image));
         if(activeFakels2 === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1303,9 +2018,15 @@
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels2 * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels2 = activeFakels2-1
+        if(activeFakels2 === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel2', JSON.stringify(image));
+        }
       } else {
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+          localStorage.setItem('kotel2', JSON.stringify(image));
         if(activeFakels2 === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1330,9 +2051,15 @@
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels2 * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels2 = activeFakels2-1
+        if(activeFakels2 === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel2', JSON.stringify(image));
+        }
       } else {
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+          localStorage.setItem('kotel2', JSON.stringify(image));
         if(activeFakels2 === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1421,7 +2148,38 @@
     // labels[11].textContent = "25"
     // labels[12].textContent = "0"
     }
-    
+    function startTimer() {
+      let seconds = 0;
+
+      // Display the initial value
+      updateTimerDisplay(seconds);
+
+      // Start the timer
+      timerInterval = setInterval(function() {
+        seconds++;
+        updateTimerDisplay(seconds);
+      }, 1000); // 1000 milliseconds = 1 second
+    }
+
+    function stopTimer() {
+      // Clear the interval to stop the timer
+      clearInterval(timerInterval);
+    }
+
+    function updateTimerDisplay(seconds) {
+      const timerDisplay = document.getElementById('timer');
+      timerDisplay.textContent = formatTime(seconds);
+    }
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${padZero(minutes)}:${padZero(remainingSeconds)}`;
+    }
+
+    function padZero(value) {
+      return value.toString().padStart(2, '0');
+    }
     function handleIncreaseUClick3(){
       var ugol_con = document.getElementById("ugol_con3");
       var ugol_total_con = document.getElementById("t_per_h")
@@ -1471,9 +2229,15 @@
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels3 * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels3 = activeFakels3-1
+        if(activeFakels3 === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel3', JSON.stringify(image));
+        }
       } else {
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+          localStorage.setItem('kotel3', JSON.stringify(image));
         if(activeFakels3 === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1499,9 +2263,15 @@
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels3 * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels3 = activeFakels3-1
+        if(activeFakels3 === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel3', JSON.stringify(image));
+        }
       } else {
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+          localStorage.setItem('kotel3', JSON.stringify(image));
         if(activeFakels2 === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1526,9 +2296,15 @@
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels3 * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels3 = activeFakels3-1
+        if(activeFakels3 === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel3', JSON.stringify(image));
+        }
       } else {
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+          localStorage.setItem('kotel3', JSON.stringify(image));
         if(activeFakels3 === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1553,9 +2329,15 @@
         mazut_con_total.value = (currentValue_total_con - 1/activeFakels3 * currentValue_con).toFixed(2)
         button.style.backgroundColor = "red";
         activeFakels3 = activeFakels3-1
+        if(activeFakels3 === 0){
+          var image = { image: 0 };
+          localStorage.setItem('kotel3', JSON.stringify(image));
+        }
       } else {
         var currentValue_con = parseFloat(mazut_con.value)
         var currentValue_total_con = parseFloat(mazut_con_total.value)
+        var image = { image: 1 };
+          localStorage.setItem('kotel3', JSON.stringify(image));
         if(activeFakels2 === 0){
           mazut_con.value = (7/4).toFixed(2)
           mazut_con_total.value = (currentValue_total_con + 7/4).toFixed(2)
@@ -1582,7 +2364,11 @@
       fakel[1] = document.getElementById("f2");
       fakel[2] = document.getElementById("f3");
       fakel[3] = document.getElementById("f4");
-
+    var gorelka =[]
+      gorelka[0] = document.getElementById("uf1");
+      gorelka[1] = document.getElementById("uf2");
+      gorelka[2] = document.getElementById("uf3");
+      gorelka[3] = document.getElementById("uf4");
     var startKotel2 = document.getElementById("start_k_button2");
     var increase_k_button2 = document.getElementById("increase2_k");
     var decrease_k_button2 = document.getElementById("decrease2_k");
@@ -1595,6 +2381,11 @@
       fakel2[1] = document.getElementById("f22");
       fakel2[2] = document.getElementById("f23");
       fakel2[3] = document.getElementById("f24");
+    var gorelka2 =[]
+      gorelka2[0] = document.getElementById("uf21");
+      gorelka2[1] = document.getElementById("uf22");
+      gorelka2[2] = document.getElementById("uf23");
+      gorelka2[3] = document.getElementById("uf24");
 
     var startKotel3 = document.getElementById("start_k_button3");
     var increase_k_button3 = document.getElementById("increase_k3");
@@ -1608,6 +2399,11 @@
       fakel3[1] = document.getElementById("f32");
       fakel3[2] = document.getElementById("f33");
       fakel3[3] = document.getElementById("f34");
+    var gorelka3 =[]
+      gorelka3[0] = document.getElementById("uf31");
+      gorelka3[1] = document.getElementById("uf32");
+      gorelka3[2] = document.getElementById("uf33");
+      gorelka3[3] = document.getElementById("uf34");
 
     var starttur = document.getElementById("start_t_button");
     var increase_mW_button = document.getElementById("increasemW");
@@ -1630,6 +2426,10 @@
     fakel[1].addEventListener("click", handleF2Click);
     fakel[2].addEventListener("click", handleF3Click);
     fakel[3].addEventListener("click", handleF4Click);
+    gorelka[0].addEventListener("click", handleG1Click);
+    gorelka[1].addEventListener("click", handleG2Click);
+    gorelka[2].addEventListener("click", handleG3Click);
+    gorelka[3].addEventListener("click", handleG4Click);
 
     startKotel2.addEventListener("click", handleKotel2Click);
     increase_k_button2.addEventListener("click", handleIncrease2_k_Click);
@@ -1642,6 +2442,10 @@
     fakel2[1].addEventListener("click", handleF2Click2);
     fakel2[2].addEventListener("click", handleF3Click2);
     fakel2[3].addEventListener("click", handleF4Click2);
+    gorelka2[0].addEventListener("click", handleG1Click2);
+    gorelka2[1].addEventListener("click", handleG2Click2);
+    gorelka2[2].addEventListener("click", handleG3Click2);
+    gorelka2[3].addEventListener("click", handleG4Click2);
       
     startKotel3.addEventListener("click", handleKotel3Click);
     increase_k_button3.addEventListener("click", handleIncrease3_k_Click);
@@ -1654,7 +2458,10 @@
     fakel3[1].addEventListener("click", handleF2Click3);
     fakel3[2].addEventListener("click", handleF3Click3);
     fakel3[3].addEventListener("click", handleF4Click3);
-
+    gorelka3[0].addEventListener("click", handleG1Click3);
+    gorelka3[1].addEventListener("click", handleG2Click3);
+    gorelka3[2].addEventListener("click", handleG3Click3);
+    gorelka3[3].addEventListener("click", handleG4Click3);
 
     clear_button.addEventListener("click", handleClearClick);
       
@@ -1674,6 +2481,8 @@
   <div>
     <button class = "button" id = "clear">Clear</button>
     <a href="{% url 'demo' %}" class="button">Presentation</a>
+    <button class = "button" onclick="stopTimer()">Stop</button>
+    <label id="timer">00:00</label>
   </div>
     <div class="container">
       <div class="item1">
@@ -1745,6 +2554,12 @@
           <button class= "fakel" id="f3">3</button>
           <button class= "fakel" id="f4">4</button>
         </div>
+        <div class="ugolfakels">
+          <button class= "fakel" id="uf1">1</button>
+          <button class= "fakel" id="uf2">2</button>
+          <button class= "fakel" id="uf3">3</button>
+          <button class= "fakel" id="uf4">4</button>
+        </div>
         <div class = "startB"> 
           <button class= "button" id="start_k_button">Start</button>
         </div>
@@ -1787,6 +2602,12 @@
           <button class= "fakel" id="f22">2</button>
           <button class= "fakel" id="f23">3</button>
           <button class= "fakel" id="f24">4</button>
+        </div>
+        <div class="ugolfakels">
+          <button class= "fakel" id="uf21">1</button>
+          <button class= "fakel" id="uf22">2</button>
+          <button class= "fakel" id="uf23">3</button>
+          <button class= "fakel" id="uf24">4</button>
         </div>
         <div class = "startB"> 
           <button class= "button" id="start_k_button2">Start</button>
@@ -1832,6 +2653,12 @@
           <button class= "fakel" id="f32">2</button>
           <button class= "fakel" id="f33">3</button>
           <button class= "fakel" id="f34">4</button>
+        </div>
+        <div class="ugolfakels">
+          <button class= "fakel" id="uf31">1</button>
+          <button class= "fakel" id="uf32">2</button>
+          <button class= "fakel" id="uf33">3</button>
+          <button class= "fakel" id="uf34">4</button>
         </div>
         <div class = "startB"> 
           <button class= "button" id="start_k_button3">Start</button>

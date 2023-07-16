@@ -1,129 +1,145 @@
-.bar {
-    width: 20px;
-    height:280px; /* Adjust the height as needed */
+#bar1 {
+    width: 10px;
+    height:245px; 
     border: 1px solid black;
     position: absolute;
-    top: 227px;
-    left:300px;
+    top: 300px;
+    left: 340px;
   }
-  .container5 {
-    position: relative;
-    margin: 20px;
+  #bar2 {
+    width: 10px;
+    height:245px; 
+    border: 1px solid black;
+    position: absolute;
+    top: 300px;
+    left: 790px;
+  }
+  #bar3 {
+    width: 10px;
+    height:245px; 
+    border: 1px solid black;
+    position: absolute;
+    top: 300px;
+    left: 1240px;
   }
   body {
-    background-color: #1C1E16; /* Replace with your desired background color */
-  }
-  .container6 {
-    position: absolute;
-    left: 800px;
+    background-color: #1C1E16; 
   }
   
-  .mazut-image {
+  #canvas {
+    border: 1px solid black;
+  }
+  #mazut-image {
     position: absolute;
     top: 0;
-    left: 0;
-    width: auto; /* Adjust the width as needed */
+    left: 1000px;
+    width: auto; 
     height: 150px;
-    margin: 10px;
+    margin: 20px;
   }
-  .turbine1{
-    position: relative;
-    top: 600px;
-    left: 200px;
-    width: auto; /* Adjust the width as needed */
-    height: 150px;
-  }
-  .turbine2{
-    position: relative;
-    top: 600px;
-    left: 350px;
-    width: auto; /* Adjust the width as needed */
-    height: 150px;
-  }
-  .big-container {
-    display: flex;
-  }
-  .kotel-container {
-    display: flex;
-  }
-  .tub-container {
-    display: flex;
-  }
-  #container7 {
-    position: absolute;
-    top:200px;
-    
-  }
-  #container8 {
-    position: absolute;
-    left: 400px;
-    top:200px;
-
-  }
-  .f1{
-    position: absolute;
-    width:auto;
-    height:40px;
-    transform: rotate(90deg);
-    top: 40%;
-    left: 26px;
-  }
-  .f3{
-    position: absolute;
-    width:auto;
-    height:40px;
-    transform: rotate(90deg);
-    top: 60%;
-    left: 26px;
-  }
-  .f2{
-    position: absolute;
-    width:auto;
-    height:40px;
-    transform: rotate(270deg);
-    top: 40%;
-    left: 104px;
-  }
-  .f4{
-    position: absolute;
-    width:auto;
-    height:40px;
-    transform: rotate(270deg);
-    top: 60%;
-    left: 104px;
-  }
-  #container9 {
-    position: absolute;
-    left: 800px;
-    top:200px;
-  }
-  .kotel_image{
-    height: 400px;
-    width: auto;
-  }
-  .kotel_image2{
-    height: 400px;
-    width: auto;
-  }
-  .kotel_image3{
-    height: 400px;
-    width: auto;
-  }
-  .label_mazut {
+  #mazutL {
     position:absolute;
     color: aliceblue;
     top: 100px;
-    left: 60px;
+    left: 1070px;
   }
-  
-  .gif-image {
+  #image {
     position: absolute;
-    top: 0;
+    top: 20px;
     left: 0;
-    width: 550px; /* Adjust the width as needed */
+    width: 600px; 
     height: auto;
-    margin: 10px;
+    margin: 20px;
   }
+  #turbine1{
+    position: absolute;
+    top: 900px;
+    left: 302px;
+    width: auto; 
+    height: 150px;
+  }
+  #turbine2{
+    position: absolute;
+    top: 900px;
+    left: 702px;
+    width: auto; 
+    height: 150px;
+  }
+  #k1{
+    position: absolute;
+    top: 870px;
+    left: 444px;
+    width: auto; 
+    height: 30px;
+  }
+  #k2{
+    position: absolute;
+    top: 870px;
+    left: 844px;
+    width: auto; 
+    height: 30px;
+  }
+
+  #f1{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(90deg);
+    top: 450px;
+    left: 120px;
+  }
+  #f3{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(90deg);
+    top: 510px;
+    left: 120px;
+  }
+  #f2{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(270deg);
+    top: 450px;
+    left: 187px;
+  }
+  #f4{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(270deg);
+    top: 510px;
+    left: 187px;
+  }
+
+  #kotel_image{
+    position: absolute;
+    height: 400px;
+    width: auto;
+    top: 250px;
+    left: 50px;
+    margin: 20px;
+  }
+  #kotel_image2{
+    position: absolute;
+    height: 400px;
+    width: auto;
+    top: 250px;
+    left: 500px;
+    margin: 20px;
+  }
+  #kotel_image3{
+    position: absolute;
+    height: 400px;
+    width: auto;
+    top: 250px;
+    left: 950px;
+    margin: 20px;
+  }
+
+  
+ 
   
   .label {
     position: absolute;
@@ -132,8 +148,135 @@
     left: 250px;
     margin: 10px;
   }
-  
-  .fill {
+  #tempL{
+    position: absolute;
+    color: black;
+    border: 1px solid grey;
+    background-color: white;
+    top: 560px;
+    left: 270px;
+    width: 80px;
+  }
+  #prL{
+    position: absolute;
+    color: black;
+    background-color: white;
+    border: 1px solid grey;
+    top: 580px;
+    left: 270px;
+    width: 80px;
+  }
+  #parL{
+    position: absolute;
+    color: black;
+    background-color: white;
+    border: 1px solid grey;
+    top: 600px;
+    left: 270px;
+    width: 80px;
+  }
+  #parTotal{
+    position: absolute;
+    color: black;
+    background-color: white;
+    border: 1px solid grey;
+    top: 620px;
+    left: 270px;
+    width: 80px;
+  }
+  #tempL2{
+    position: absolute;
+    color: black;
+    background-color: white;
+    top: 560px;
+    left: 720px;
+    width: 80px;
+    border: 1px solid grey;
+  }
+  #prL2{
+    position: absolute;
+    color: black;
+    background-color: white;
+    top: 580px;
+    left: 720px;
+    width: 80px;
+    border: 1px solid grey;
+  }
+  #parL2{
+    position: absolute;
+    color: black;
+    background-color: white;
+    top: 600px;
+    left: 720px;
+    width: 80px;
+    border: 1px solid grey;
+  }
+  #parTotal2{
+    position: absolute;
+    background-color: white;
+    color: black;
+    border: 1px solid grey;
+    top: 620px;
+    left: 720px;
+    width: 80px;
+  }
+  #tempL3{
+    position: absolute;
+    color: black;
+    background-color: white;
+    top: 560px;
+    left: 1170px;
+    width: 80px;
+    border: 1px solid grey;
+  }
+  #prL3{
+    position: absolute;
+    color: black;
+    background-color: white;
+    top: 580px;
+    left: 1170px;
+    width: 80px;
+    border: 1px solid grey;
+  }
+  #parL3{
+    position: absolute;
+    color: black;
+    background-color: white;
+    top: 600px;
+    left: 1170px;
+    width: 80px;
+    border: 1px solid grey;
+  }
+  #parTotal3{
+    position: absolute;
+    background-color: white;
+    color: black;
+    border: 1px solid grey;
+    top: 620px;
+    left: 1170px;
+    width: 80px;
+  }
+  #tempBar1 {
+    width: 100%;
+    height: 0;
+    background: linear-gradient(to top, red, yellow);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transition: height 1s ease;
+    transform-origin: bottom; /* Added to set transform origin */
+  }
+  #tempBar2 {
+    width: 100%;
+    height: 0;
+    background: linear-gradient(to top, red, yellow);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transition: height 1s ease;
+    transform-origin: bottom; /* Added to set transform origin */
+  }
+  #tempBar3 {
     width: 100%;
     height: 0;
     background: linear-gradient(to top, red, yellow);
@@ -156,4 +299,143 @@
   }
   .button:hover {
     background-color: #0056b3;
+  }
+  #f21{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(90deg);
+    top: 450px;
+    left: 570px;
+  }
+  #f23{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(90deg);
+    top: 510px;
+    left: 570px;
+  }
+  #f22{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(270deg);
+    top: 450px;
+    left: 634px;
+  }
+  #f24{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(270deg);
+    top: 510px;
+    left: 634px;
+  }
+  #f31{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(90deg);
+    top: 450px;
+    left: 1020px;
+  }
+  #f33{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(90deg);
+    top: 510px;
+    left: 1020px;
+  }
+  #f32{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(270deg);
+    top: 450px;
+    left: 1087px;
+  }
+  #f34{
+    position: absolute;
+    width:auto;
+    height:40px;
+    transform: rotate(270deg);
+    top: 510px;
+    left: 1087px;
+  }
+  #z1 {
+    position: absolute;
+    top: 700px;
+    left: 230px;
+    height: auto;
+    width: 40px;
+  }
+  #z2 {
+    position: absolute;
+    top: 700px;
+    left: 680px;
+    height: auto;
+    width: 40px;
+  }
+  #z3 {
+    position: absolute;
+    top: 700px;
+    left: 1130px;
+    height: auto;
+    width: 40px;
+  }
+  #par1{
+    position: absolute;
+    color: black;
+    border: 1px solid grey;
+    background-color: white;
+    top: 900px;
+    left: 222px;
+    width: 80px;
+  }
+  #mw1{
+    position: absolute;
+    color: black;
+    background-color: white;
+    border: 1px solid grey;
+    top: 920px;
+    left: 222px;
+    width: 80px;
+  }
+  #kwh1{
+    position: absolute;
+    color: black;
+    background-color: white;
+    border: 1px solid grey;
+    top: 940px;
+    left: 222px;
+    width: 80px;
+  }
+  #par2{
+    position: absolute;
+    color: black;
+    border: 1px solid grey;
+    background-color: white;
+    top: 900px;
+    left: 622px;
+    width: 80px;
+  }
+  #mw2{
+    position: absolute;
+    color: black;
+    background-color: white;
+    border: 1px solid grey;
+    top: 920px;
+    left: 622px;
+    width: 80px;
+  }
+  #kwh2{
+    position: absolute;
+    color: black;
+    background-color: white;
+    border: 1px solid grey;
+    top: 940px;
+    left: 622px;
+    width: 80px;
   }

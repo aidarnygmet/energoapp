@@ -100,6 +100,7 @@
     'k_p_h'
     'totals'
     'fakels'
+    'ugolfakels'
     'startB';
   grid-gap: 10px;
   }
@@ -115,6 +116,7 @@
     'k_p_h'
     'totals'
     'fakels'
+    'ugolfakels'
     'startB';
   grid-gap: 10px;
   }
@@ -130,11 +132,15 @@
     'k_p_h'
     'totals'
     'fakels'
+    'ugolfakels'
     'startB';
   grid-gap: 10px;
   }
   .fakels{
     grid-area: fakels;
+  }
+  .ugolfakels{
+    grid-area: ugolfakels;
   }
   .ugols{
     grid-area: ugols;
