@@ -5,6 +5,16 @@
   <title>Demo</title>
   
   <link rel="stylesheet" type="text/css" href="{% static 'styles2.css' %}">
+  <style>
+    .tooltip {
+    position: absolute;
+    padding: 4px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 12px;
+    pointer-events: none; /* Prevent the tooltip from blocking mouse events on the graph */
+}
+  </style>
   <script>
     var pressed=0;
     var canvas;
@@ -570,6 +580,183 @@
     <label id="mw2">0 МВт</label>
     <label id="kwh2">0 кВт*ч</label>
     <img src="{% static 'turbineoff.jpeg' %}" id="turbine2">
+    <div id="graph-container">
+    </div>
+    <script src="{% static 'd3.v7.min.js' %}"></script>
+    <script>
+        // Fetch data from the Django view
+        fetch('/graph-data/')
+          .then(response => response.json())
+          .then(data => createGraph(data))
+          .catch(error => console.error('Error fetching data:', error));
+    
+        // Function to create the D3.js graph
+        function createGraph(data) {
+          const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+          const width = 800 - margin.left - margin.right;
+          const height = 400 - margin.top - margin.bottom;
+          data.sort((a,b)=>a.timestamp.localeCompare(b.timestamp))
+          const svg = d3.select("#graph-container")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+            svg.append("rect")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("fill", "aliceblue");
+          const xScale = d3.scaleTime()
+            .domain(d3.extent(data, d => new Date(d.timestamp)))
+            .range([0, width]);
+    
+          const yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.value)])
+            .range([height, 0]);
+    
+          const line = d3.line()
+            .x(d => xScale(new Date(d.timestamp)))
+            .y(d => yScale(d.value));
+    
+          svg.append("path")
+            .datum(data)
+            .attr("transform", `translate(${margin.left},0)`)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 2)
+            .attr("d", line)
+            .on("mousemove", showTooltip) // Show tooltip on mousemove
+            .on("mouseout", hideTooltip);
+    
+            
+          svg.append("g")
+            .attr("transform", `translate(${margin.left},${height})`)
+            .call(d3.axisBottom(xScale));
+    
+          svg.append("g")
+            .attr("transform", `translate(${margin.left},0)`)
+            .call(d3.axisLeft(yScale));
+            function showTooltip(event) {
+                const mouseX = event.clientX;
+                const mouseY = event.clientY;
 
+                // Convert mouse coordinates to graph coordinates
+                const graphX = mouseX - margin.left;
+                const graphY = mouseY - margin.top;
+
+                // Convert graph coordinates to data values
+                const xValue = xScale.invert(graphX);
+                const yValue = yScale.invert(graphY);
+
+                // Display the tooltip at the cursor position with the data value
+                tooltip.style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 30) + "px")
+                    .html(`${yValue}`); // Adjust the value display format as needed
+
+                tooltip.style("display", "block");
+            }
+
+            // Function to hide the tooltip
+            function hideTooltip() {
+                tooltip.style("display", "none");
+            }
+
+            // Create the tooltip element
+            const tooltip = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("display", "none");
+          
+            
+        }
+        const socket = new WebSocket('ws://localhost:8002/ws/graph/');
+
+        socket.onmessage = function (event) {
+        const newData = JSON.parse(event.data);
+        newData.sort((a,b)=>a.timestamp.localeCompare(b.timestamp))
+        updateGraph(newData);
+        };
+        socket.onopen = () => {
+  console.log('WebSocket connection opened.');
+
+};
+        function updateGraph(data){
+            const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+          const width = 800 - margin.left - margin.right;
+          const height = 400 - margin.top - margin.bottom;
+    
+          d3.select("#graph-container").select("svg").remove()
+          const svg = d3
+            .select("#graph-container")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+            svg.append("rect")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("fill", "aliceblue");
+          const xScale = d3.scaleTime()
+            .domain(d3.extent(data, d => new Date(d.timestamp)))
+            .range([0, width]);
+    
+          const yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.value)])
+            .range([height, 0]);
+    
+          const line = d3.line()
+            .x(d => xScale(new Date(d.timestamp)))
+            .y(d => yScale(d.value));
+    
+          svg.append("path")
+            .datum(data)
+            .attr("transform", `translate(${margin.left},0)`)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 2)
+            .attr("d", line)
+            .on("mousemove", showTooltip) // Show tooltip on mousemove
+            .on("mouseout", hideTooltip);
+    
+            
+          svg.append("g")
+            .attr("transform", `translate(${margin.left},${height})`)
+            .call(d3.axisBottom(xScale));
+    
+          svg.append("g")
+            .attr("transform", `translate(${margin.left},0)`)
+            .call(d3.axisLeft(yScale));
+            function showTooltip(event) {
+                const mouseX = event.clientX;
+                const mouseY = event.clientY;
+
+                // Convert mouse coordinates to graph coordinates
+                const graphX = mouseX - margin.left;
+                const graphY = mouseY - margin.top;
+
+                // Convert graph coordinates to data values
+                const xValue = xScale.invert(graphX);
+                const yValue = yScale.invert(graphY);
+
+                // Display the tooltip at the cursor position with the data value
+                tooltip.style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 30) + "px")
+                    .html(`${yValue}`); // Adjust the value display format as needed
+
+                tooltip.style("display", "block");
+            }
+
+            // Function to hide the tooltip
+            function hideTooltip() {
+                tooltip.style("display", "none");
+            }
+
+            // Create the tooltip element
+            const tooltip = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("display", "none");
+          
+        }
+      </script>
 </body>
 </html>

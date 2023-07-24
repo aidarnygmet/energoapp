@@ -61,13 +61,13 @@
         .then(response => response.json())
         .then(result => {
           if (result.success) {
-      console.log('Data saved successfully!');
+      console.log('Ugol Data saved successfully!');
     } else {
       console.error('Failed to save data:', result.message);
     }
         })
         .catch(error => {
-          console.error('Error:', error);
+          console.log('Error:', error.message);
         });
     }
     function sendKotelStatus(id, status){
@@ -175,7 +175,7 @@
         const dataToSend = { ugol: runningTotal };
         localStorage.setItem('data', JSON.stringify(dataToSend));
       }, 1000);
-      interval[7] = setInterval(sendDataToServer, 60000);
+      interval[7] = setInterval(sendDataToServer, 1000);
     }
     function handleMazutClick() {
       var tonsPerHourInput = document.getElementById("t_per_h2");
@@ -1095,10 +1095,9 @@
       var tonsPerHourInput2 = document.getElementById("mW2");
       var tonsTotalLabel = document.getElementById("e_total");
       if (interval[5]) {
-        // If the interval is already running, stop it
         clearInterval(interval[5]);
         interval[5] = null;
-        startButton.textContent = "Start"; // Update button label
+        startButton.textContent = "Start";
         tonsPerHourInput.disabled = false;
         mwperhour.value = "0.00";
         activeTur-=1
@@ -1139,20 +1138,18 @@
       var mwperhour = document.getElementById("actualMW2");
       var tonsTotalLabel = document.getElementById("e_total2");
       if (interval[6]) {
-        // If the interval is already running, stop it
         clearInterval(interval[6]);
         mwperhour.value = "0.00";
         interval[6] = null;
-        startButton.textContent = "Start"; // Update button label
+        startButton.textContent = "Start";
         tonsPerHourInput.disabled = false;
         activeTur-=1
         var image = { image: 0};
         var image2 = { image: 0, energy: parseFloat(mwperhour.value), par: parseFloat(tonsPerHourInput.value), total:parseFloat(tonsTotalLabel.textContent)};
         localStorage.setItem('tur2', JSON.stringify(image));
-        localStorage.setItem('energy2', JSON.stringify(image));
+        localStorage.setItem('energy2', JSON.stringify(image2));
         adjustTurbines();
       } else {
-        
         tonsPerHourInput.disabled = true;
         interval[6] = setInterval(function() {
           var tonsPerHour = parseFloat(mwperhour.value);
@@ -1165,7 +1162,6 @@
             var image = { image: 0, energy: tonsPerHour, par: parseFloat(tonsPerHourInput.value), total:parseFloat(tonsTotalLabel.textContent)};
             localStorage.setItem('energy2', JSON.stringify(image));
           }
-          
         }, 1000);
         activeTur+=1;
         startButton.textContent = "Stop"; 

@@ -25,20 +25,30 @@ SECRET_KEY = 'django-insecure-7c@g6-w2m=!ex+nlvvvco1h5ih!ropwr=zr$w%=qpv-a@xm@(@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.64', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.1.64', 'localhost', '127.0.0.1', '192.168.1.66']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app'
+    'app.apps.ChannelsAppConfig',
+    'channels'
+    
+    
 ]
+CHANNEL_LAYERS = {
+    'default': {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+ASGI_APPLICATION = 'teploapp.asgi.application'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -68,7 +78,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'teploapp.wsgi.application'
 
 
 # Database
@@ -120,7 +129,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -3,7 +3,8 @@ from .models import ugol, kotel_status, kotel_info
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .forms import kotel_statusForm
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 # Create your views here.
 def base(request):
     return render(request, 'base.html')
@@ -16,7 +17,6 @@ def save_data(request):
         try:
             data = json.loads(request.body)
             value = data.get('value')
-
             if value is not None:
                 ugol_object = ugol(value=value)
                 ugol_object.save()
@@ -27,7 +27,7 @@ def save_data(request):
         except json.JSONDecodeError:
             # Handle the case when the request body is not valid JSON
             return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
-
+  
     return JsonResponse({'message': 'Invalid request.'})
 
 @csrf_exempt 
@@ -92,3 +92,26 @@ def save_kotel_info(request):
             return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
 
     return JsonResponse({'message': 'Invalid request.'})
+def graph_data(request):
+    data = ugol.objects.all().values('value', 'timestamp')
+    formatted_data = [{'value': item['value'], 'timestamp': item['timestamp']} for item in data]
+
+    return JsonResponse(formatted_data, safe=False)
+def update_graph(request):
+    # Retrieve the data from the model
+    data = ugol.objects.all().values('value', 'timestamp')
+
+    # Convert the data to a suitable format (e.g., a list of dictionaries)
+    graph_data = [
+        {'value': entry.value, 'timestamp': entry.timestamp.isoformat()}
+        for entry in data
+    ]
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'graph_group',  # Group name to target connected clients
+        {
+            'type': 'send_update',
+            'data': graph_data,
+        }
+    )
+    return HttpResponse('Update successful!')
