@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from app.views import save_data, save_kotel_status, update_kotel_status, save_kotel_info, graph_data,update_graph
+from app.views import save_data, save_kotel_status, update_kotel_status, save_kotel_info, graph_data,update_graph, kotel_graph_data
 from app import consumer
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
@@ -27,7 +27,8 @@ urlpatterns = [
     path('update-kotel-status/<int:object_id>/', update_kotel_status, name='update_kotel_status'),
     path('save-kotel-info/', save_kotel_info, name='save_kotel_info'), 
     path('graph-data/', graph_data, name='graph_data'),
-    path('update-graph/', update_graph, name='update_graph')
+    path('update-graph/', update_graph, name='update_graph'),
+    path('kotel-graph-data/', kotel_graph_data, name='kotel_graph_data'),
     # ... other URL patterns ...
 ]
 urlpatterns += staticfiles_urlpatterns()

@@ -6,6 +6,26 @@
   
   <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
   <script>
+    // var startButton = document.getElementById("start_k_button");
+    //   var mazutInput = document.getElementById("t_per_h2");
+    //   var ugolInput = document.getElementById("t_per_h")
+    //   var ugoltotal = document.getElementById("t_total")
+    //   var mazuttotal = document.getElementById("t_total2")
+    //   var ugol_con = document.getElementById("ugol_con")
+    //   var mazut_con = document.getElementById("mazut_con")
+    //   var goal_temp = document.getElementById("goal_temp")
+    //   var goal_time = document.getElementById("goal_time")
+    //   var ugol_con2 = document.getElementById("ugol_con2")
+    //   var mazut_con2 = document.getElementById("mazut_con2")
+    //   var goal_temp2 = document.getElementById("goal_temp2")
+    //   var goal_time2 = document.getElementById("goal_time2")
+    //   var ugol_con3 = document.getElementById("ugol_con3")
+    //   var mazut_con3 = document.getElementById("mazut_con3")
+    //   var goal_temp3 = document.getElementById("goal_temp3")
+    //   var goal_time3 = document.getElementById("goal_time3")
+    //   var tempL = document.getElementById("temp")
+    //   var prL =  document.getElementById("pr")
+    //   var tonsPerHour = document.getElementById("k_per_h")
     var interval = []
     for(var i=0; i<12; i++){
       interval[i] = null;
@@ -45,9 +65,14 @@
     var totalPar = 0;
     var activeTur = 0;
     var waste = 0;
+    // let worker;
+    // if (!worker) {
+    //     worker = new Worker('/count_worker.js');
+        
+    //   }
     function sendDataToServer() {
-      label = document.getElementById("t_total")
-      const value = parseFloat(label.textContent); 
+      label = document.getElementById("t_per_h")
+      const value = parseFloat(label.value); 
       const data = {
         value: value
       };
@@ -483,6 +508,7 @@
       }
       
     }
+    
     function handleKotel2Click() {
       var startButton = document.getElementById("start_k_button2");
       var tonsPerHourInput = document.getElementById("k_per_h2");
@@ -2486,8 +2512,6 @@
         <div class = "tons_p_h">
           <label>Tons per hour</label>
           <input type="text" class="input" style="width: 50px;" id="t_per_h" disabled>
-          
-          
         </div>
         <div class="totals">
             <label>Tons total</label>
@@ -2500,17 +2524,13 @@
         <div class = "mazut_p_h">
           <label">Tons per hour</label>
           <input type="text" class="input" style="width: 50px;" id="t_per_h2" disabled>
-          
-          
         </div>
         <div class="totals2">
             <label>Tons total</label>
             <label id="t_total2" style="font-weight: bold;">0</label>
-            
         </div>
       </div>
     </div>
-
     <div class="container2">
       <div class="item item3">
         <div class="kotel">Kotel 1</div>

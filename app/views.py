@@ -97,6 +97,11 @@ def graph_data(request):
     formatted_data = [{'value': item['value'], 'timestamp': item['timestamp']} for item in data]
 
     return JsonResponse(formatted_data, safe=False)
+def kotel_graph_data(request):
+    data = kotel_info.objects.all().values('kotel_id','par', 'timestamp')
+    formatted_data = [{'kotel_id': item['kotel_id'], 'value': item['par'], 'timestamp': item['timestamp']} for item in data]
+
+    return JsonResponse(formatted_data, safe=False)
 def update_graph(request):
     # Retrieve the data from the model
     data = ugol.objects.all().values('value', 'timestamp')

@@ -14,6 +14,12 @@
     font-size: 12px;
     pointer-events: none; /* Prevent the tooltip from blocking mouse events on the graph */
 }
+#graph-container svg {
+      background-color: lightgray; /* Set your desired background color here */
+    }
+    #graph-container2 svg {
+      background-color: lightgray; /* Set your desired background color here */
+    }
   </style>
   <script>
     var pressed=0;
@@ -582,6 +588,7 @@
     <img src="{% static 'turbineoff.jpeg' %}" id="turbine2">
     <div id="graph-container">
     </div>
+    <div id="graph-container2"></div>
     <script src="{% static 'd3.v7.min.js' %}"></script>
     <script>
         // Fetch data from the Django view
@@ -602,10 +609,6 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
-            svg.append("rect")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .attr("fill", "aliceblue");
           const xScale = d3.scaleTime()
             .domain(d3.extent(data, d => new Date(d.timestamp)))
             .range([0, width]);
@@ -636,6 +639,15 @@
           svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
             .call(d3.axisLeft(yScale));
+
+
+    // Append y-axis label
+    svg.append("text")
+      .attr("class", "axis-label")
+      .attr("x", -height / 2)
+      .attr("y", 10)
+      .attr("transform", "rotate(-90)")
+      .text("Уголь, тонн в час");
             function showTooltip(event) {
                 const mouseX = event.clientX;
                 const mouseY = event.clientY;
@@ -676,10 +688,10 @@
         updateGraph(newData);
         };
         socket.onopen = () => {
-  console.log('WebSocket connection opened.');
-
-};
+            console.log('WebSocket connection opened.');
+        };
         function updateGraph(data){
+            console.log("graph updated")
             const margin = { top: 20, right: 30, bottom: 30, left: 40 };
           const width = 800 - margin.left - margin.right;
           const height = 400 - margin.top - margin.bottom;
@@ -692,10 +704,7 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
-            svg.append("rect")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .attr("fill", "aliceblue");
+            
           const xScale = d3.scaleTime()
             .domain(d3.extent(data, d => new Date(d.timestamp)))
             .range([0, width]);
@@ -726,6 +735,12 @@
           svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
             .call(d3.axisLeft(yScale));
+            svg.append("text")
+      .attr("class", "axis-label")
+      .attr("x", -height / 2)
+      .attr("y", 10)
+      .attr("transform", "rotate(-90)")
+      .text("Уголь, тонн в час");
             function showTooltip(event) {
                 const mouseX = event.clientX;
                 const mouseY = event.clientY;
@@ -756,6 +771,141 @@
                 .attr("class", "tooltip")
                 .style("display", "none");
           
+        }
+        fetch('/kotel-graph-data/')
+          .then(response => response.json())
+          .then(data => createKotelGraph(data))
+          .catch(error => console.error('Error fetching data:', error));
+        function createKotelGraph(data){
+            const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+          const width = 800 - margin.left - margin.right;
+          const height = 400 - margin.top - margin.bottom;
+          data.sort((a,b)=>a.timestamp.localeCompare(b.timestamp))
+          console.log(data[0].kotel_id)
+          const svg = d3.select("#graph-container2")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+          const xScale = d3.scaleTime()
+            .domain(d3.extent(data, d => new Date(d.timestamp)))
+            .range([0, width]);
+    
+          const yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.value)])
+            .range([height, 0]);
+    
+          const line = d3.line()
+            .x(d => xScale(new Date(d.timestamp)))
+            .y(d => yScale(d.value));
+          for(var i=1; i<4; i++){
+            const filteredData = data.filter(item => item.kotel_id === i);
+            if(i===1){
+                color = "red"
+            } else if(i === 2){
+                color = 'green'
+            } else {
+                color = 'yellow'
+            }
+            svg.append("path")
+            .datum(filteredData)
+            .attr("transform", `translate(${margin.left},0)`)
+            .attr("fill", "none")
+            .attr("stroke", color)
+            .attr("stroke-width", 2)
+            .attr("d", line)
+          }
+          
+    
+            
+          svg.append("g")
+            .attr("transform", `translate(${margin.left},${height})`)
+            .call(d3.axisBottom(xScale));
+    
+          svg.append("g")
+            .attr("transform", `translate(${margin.left},0)`)
+            .call(d3.axisLeft(yScale));
+
+
+    // Append y-axis label
+    svg.append("text")
+      .attr("class", "axis-label")
+      .attr("x", -height / 2)
+      .attr("y", 10)
+      .attr("transform", "rotate(-90)")
+      .text("Пар, тонн в час");
+          }
+          const socket2 = new WebSocket('ws://localhost:8002/ws/graph2/');
+
+            socket2.onmessage = function (event) {
+            const newData2 = JSON.parse(event.data);
+            newData2.sort((a,b)=>a.timestamp.localeCompare(b.timestamp))
+            updateKotelGraph(newData2);
+            };
+        socket.onopen = () => {
+            console.log('WebSocket connection opened.');
+        };
+        function updateKotelGraph(data){
+            console.log("kote graph updated")
+            const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+          const width = 800 - margin.left - margin.right;
+          const height = 400 - margin.top - margin.bottom;
+          d3.select("#graph-container2").select("svg").remove();
+          const svg = d3.select("#graph-container2")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+          const xScale = d3.scaleTime()
+            .domain(d3.extent(data, d => new Date(d.timestamp)))
+            .range([0, width]);
+    
+          const yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.value)])
+            .range([height, 0]);
+    
+          const line = d3.line()
+            .x(d => xScale(new Date(d.timestamp)))
+            .y(d => yScale(d.value));
+          for(var i=1; i<4; i++){
+            const filteredData = data.filter(item => item.kotel_id === i);
+            if(i===1){
+                color = "red"
+            } else if(i === 2){
+                color = 'green'
+            } else {
+                color = 'yellow'
+            }
+            svg.append("path")
+            .datum(filteredData)
+            .attr("transform", `translate(${margin.left},0)`)
+            .attr("fill", "none")
+            .attr("stroke", color)
+            .attr("stroke-width", 2)
+            .attr("d", line)
+          }
+          
+    
+            
+          svg.append("g")
+            .attr("transform", `translate(${margin.left},${height})`)
+            .call(d3.axisBottom(xScale));
+    
+          svg.append("g")
+            .attr("transform", `translate(${margin.left},0)`)
+            .call(d3.axisLeft(yScale));
+
+
+    // Append y-axis label
+    svg.append("text")
+      .attr("class", "axis-label")
+      .attr("x", -height / 2)
+      .attr("y", 10)
+      .attr("transform", "rotate(-90)")
+      .text("Пар, тонн в час");
+       
         }
       </script>
 </body>
