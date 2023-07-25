@@ -609,14 +609,24 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
+          const parseDate = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
+          const formatTime = d3.timeFormat("%-I:%M"); // Custom time format
+          const minTimestamp = new Date(d3.min(data, d => d.timestamp));
+const maxTimestamp = new Date(d3.max(data, d => d.timestamp));
+console.log(minTimestamp)
           const xScale = d3.scaleTime()
-            .domain(d3.extent(data, d => new Date(d.timestamp)))
+            .domain([minTimestamp, d3.timeHour.offset(maxTimestamp, 1)])
             .range([0, width]);
     
           const yScale = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.value)])
+            .domain([0, d3.max(data, d => d.value+10)])
             .range([height, 0]);
-    
+            // svg.append("rect")
+            // .attr("fill", "none")
+            // .attr("class", "zoom-pan-rect")
+            // .attr("width", width)
+            // .attr("height", height)
+            // .call(d3.zoom().scaleExtent([1, 10]).on("zoom", zoomed));
           const line = d3.line()
             .x(d => xScale(new Date(d.timestamp)))
             .y(d => yScale(d.value));
@@ -639,6 +649,13 @@
           svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
             .call(d3.axisLeft(yScale));
+            function zoomed(event) {
+            const transform = event.transform;
+            xScale.range([0, width].map(d => transform.applyX(d)));
+            yScale.range([height, 0].map(d => transform.applyY(d)));
+            svg.select(".line").attr("d", line);
+            svg.select(".x-axis").call(d3.axisBottom(xScale));
+            }
 
 
     // Append y-axis label
@@ -705,8 +722,11 @@
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
             
+            const minTimestamp = new Date(d3.min(data, d => d.timestamp));
+const maxTimestamp = new Date(d3.max(data, d => d.timestamp));
+console.log(minTimestamp)
           const xScale = d3.scaleTime()
-            .domain(d3.extent(data, d => new Date(d.timestamp)))
+            .domain([minTimestamp, d3.timeHour.offset(maxTimestamp, 1)])
             .range([0, width]);
     
           const yScale = d3.scaleLinear()
@@ -788,8 +808,11 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
+            const minTimestamp = new Date(d3.min(data, d => d.timestamp));
+const maxTimestamp = new Date(d3.max(data, d => d.timestamp));
+console.log(minTimestamp)
           const xScale = d3.scaleTime()
-            .domain(d3.extent(data, d => new Date(d.timestamp)))
+            .domain([minTimestamp, d3.timeHour.offset(maxTimestamp, 1)])
             .range([0, width]);
     
           const yScale = d3.scaleLinear()
@@ -858,8 +881,13 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
+            const parseDate = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
+            const formatTime = d3.timeFormat("%-I:%M"); // Custom time format
+            const minTimestamp = new Date(d3.min(data, d => d.timestamp));
+const maxTimestamp = new Date(d3.max(data, d => d.timestamp));
+console.log(minTimestamp)
           const xScale = d3.scaleTime()
-            .domain(d3.extent(data, d => new Date(d.timestamp)))
+            .domain([minTimestamp, d3.timeHour.offset(maxTimestamp, 1)])
             .range([0, width]);
     
           const yScale = d3.scaleLinear()
@@ -886,9 +914,6 @@
             .attr("stroke-width", 2)
             .attr("d", line)
           }
-          
-    
-            
           svg.append("g")
             .attr("transform", `translate(${margin.left},${height})`)
             .call(d3.axisBottom(xScale));
